@@ -1,0 +1,28 @@
+# Go
+/bin/
+/build/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Node
+node_modules/
+webui/node_modules/
+webui/.vite/
+webui/dist/
+webui/.DS_Store
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# Vendoring caches (keep vendor/ tracked)
+!.gitkeep

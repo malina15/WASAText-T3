@@ -1,0 +1,35 @@
+# Demo configuration for WASAText messaging application
+# This is a simplified version for the WASA course
+
+server:
+  port: 8080
+  host: "localhost"
+
+database:
+  path: "chat.db"
+  driver: "sqlite3"
+
+logging:
+  level: "info"
+  format: "text"
+
+# Demo users for testing
+demo_users:
+  - name: "Alice"
+    username: "alice"
+  - name: "Bob"
+    username: "bob"
+  - name: "Charlie"
+    username: "charlie"
+
+# Demo conversations
+demo_conversations:
+  - name: "General Chat"
+    type: "group"
+    description: "Main discussion channel"
+  - name: "Project Discussion"
+    type: "group"
+    description: "Project-related discussions"
+  - name: "Direct Messages"
+    type: "direct"
+    description: "Private conversations"

@@ -1,273 +1,1100 @@
-openapi: 3.0.0
-servers:
-  - url: "http://localhost:3000"
+openapi: 3.0.3
 info:
-  title: Fantastic Coffee (decaffeinated)
-  description: Fantastic Coffee (decaffeinated), the skeleton project for Web and Software architecture course
-  version: 1.0.0
+  title: WASAText API
+  version: "1.0.0"
+  description: API for WASAText messaging application - A comprehensive chat system with user authentication, conversations, messages, and group management features
+  contact:
+    name: WASA Team
+    email: wasa@uniroma1.it
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+tags:
+  - name: authentication
+    description: User authentication and session management operations
+  - name: conversations
+    description: Conversation management operations including creation, retrieval, and updates
+  - name: messages
+    description: Message operations including sending, forwarding, commenting, and deletion
+  - name: groups
+    description: Group management operations including member management and settings
+  - name: users
+    description: User profile operations including username and photo management
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+security:
+  - bearerAuth: []
+
 paths:
-  /status:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-    get:
-      tags: ["General"]
-      operationId: getStatusMessage
-      summary: Get status message for the user about issues / updates
-      description: |-
-        The response contains a status message meant for the user. It might
-        contains information about current technical issues, update messages
-        or general information.
+  /session:
+    post:
+      tags: ["authentication"]
+      summary: User login and session creation
+      description: Authenticates a user and returns an identifier token. If the user does not exist, it will be created automatically with the provided name.
+      operationId: doLogin
+      security: []
+      requestBody:
+        description: User login credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: User login information
+              properties:
+                name:
+                  type: string
+                  description: Username for login
+                  example: "Maria"
+                  pattern: '^[a-zA-Z0-9_]{3,16}$'
+                  minLength: 3
+                  maxLength: 16
+              required:
+                - name
       responses:
-        "200":
-          description: Status message available
+        '201':
+          description: User successfully logged in
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StatusInfo"
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-
-  /:
-    get:
-      tags: ["Group 1"]
-      operationId: index
-      summary: Get an index
-      description: |-
-        This is an example of an index API description
-      responses:
-        "200":
-          description: Successful
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-  /context:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-    post:
-      tags: ["Group 1"]
-      operationId: getContext
-      summary: Another API example
-      description: |-
-        Example description 2
-      responses:
-        "200":
-          description: Request ok
-          headers:
-            X-Access-Token:
-              description: Access token for authenticated requests
-              schema: { type: string }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-  /authenticated:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-    get:
-      tags: ["Group 2"]
-      operationId: getAuthenticatedExample
-      summary: Get an endpoint with authentication
-      description: |-
-        Get an endpoint with auth
-      security:
-        - LegacyAuth: []
-        - AppToken: []
-      responses:
-        "200":
-          description: Logout successful
-        "500": { $ref: "#/components/responses/InternalServerError" }
-
-  /pictures/{cat}:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-      - $ref: "#/components/parameters/cat"
-    get:
-      tags: ["Cat pictures"]
-      operationId: getCatFromPicture
-      summary: Example of a parameter in URL
-      description: |-
-        Example of a parameter in URL
-      security:
-        - LegacyAuth: []
-      responses:
-        "200":
-          description: Student picture found
+                type: object
+                description: Login response containing user identifier
+                properties:
+                  identifier:
+                    type: string
+                    description: Unique identifier token for the user
+                    example: "abcdef012345"
+                    pattern: '^[a-zA-Z0-9]{12,32}$'
+                    minLength: 12
+                    maxLength: 32
+        '400':
+          description: Bad request - invalid input
           content:
-            image/png:
+            application/json:
               schema:
-                type: string
-                format: binary
-              example: Picture binary file
-        "404":
-          description: Student picture not found
-        "500": { $ref: "#/components/responses/InternalServerError" }
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
-
-  /autofeeder/{cat}:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-      - $ref: "#/components/parameters/cat"
+  /user/username:
     put:
-      tags: ["Autofeeder"]
-      operationId: createCatAutofeeder
-      summary: Example of PUT operation
-      security:
-        - LegacyAuth: []
-      responses:
-        "200":
-          description: Auto feed enabled
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-    delete:
-      tags: ["Autofeeder"]
-      operationId: deleteCatAutofeeder
-      summary: Example of DELETE operation
-      security:
-        - LegacyAuth: []
-      responses:
-        "200":
-          description: Auto feed disabled
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-
-  /session/login:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-    post:
-      tags: ["Session management"]
-      operationId: login
-      summary: Log-in into system
-      description: |-
-        Perform a log-in action using username and password credentials.
-        Returns a token which can be used in authenticated requests.
+      tags: ["users"]
+      summary: Update user username
+      description: Updates the current authenticated user's username to a new value.
+      operationId: setMyUserName
       requestBody:
+        description: New username information
+        required: true
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
               type: object
+              description: Username update information
               properties:
-                userid:
+                username:
                   type: string
-                  pattern: '^[a-zA-Z0-9]+$'
+                  description: New username for the user
+                  example: "newusername"
+                  pattern: '^[a-zA-Z0-9_]{3,16}$'
                   minLength: 3
-                  maxLength: 255
-                password:
-                  type: string
-                  pattern: '^.*?$'
-                  minLength: 8
-                  maxLength: 255
+                  maxLength: 16
+              required:
+                - username
       responses:
-        "200":
-          description: Login successful
-          headers:
-            X-Access-Token:
-              description: Access token for authenticated requests
-              schema: { type: string }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "403":
-          description: Login failed
-          headers:
-            X-Message:
-              description: Error message
-              schema: { type: string }
-        "500": { $ref: "#/components/responses/InternalServerError" }
+        '200':
+          description: Username updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Success response
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Username updated successfully"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
+  /user/photo:
+    put:
+      tags: ["users"]
+      summary: Update user profile photo
+      description: Updates the current authenticated user's profile photo by uploading an image file.
+      operationId: setMyPhoto
+      requestBody:
+        description: Photo file upload
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              description: Photo upload information
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Image file (JPEG, PNG, GIF) for user profile photo
+              required:
+                - file
+      responses:
+        '200':
+          description: Photo updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Success response with photo URL
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Photo updated successfully"
+                  photoUrl:
+                    type: string
+                    description: URL of the uploaded photo
+                    example: "/photos/user_123.jpg"
+                    pattern: '^/photos/user_[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif)$'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /conversations:
+    get:
+      tags: ["conversations"]
+      summary: Get user conversations
+      description: Retrieves all conversations for the current authenticated user including both direct messages and group conversations.
+      operationId: getMyConversations
+      responses:
+        '200':
+          description: List of conversations retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                description: Array of user conversations
+                minItems: 0
+                maxItems: 100
+                items:
+                  $ref: '#/components/schemas/Conversation'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags: ["conversations"]
+      summary: Create new conversation
+      description: Creates a new conversation (either direct message or group conversation) for the authenticated user.
+      operationId: createConversation
+      requestBody:
+        description: Conversation creation data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: New conversation information
+              properties:
+                name:
+                  type: string
+                  description: Name of the conversation
+                  example: "New Chat"
+                  minLength: 1
+                  maxLength: 100
+                type:
+                  type: string
+                  description: Type of conversation
+                  example: "group"
+                  enum: ["direct", "group"]
+                  default: "group"
+              required:
+                - name
+      responses:
+        '201':
+          description: Conversation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /conversations/{id}:
+    get:
+      tags: ["conversations"]
+      summary: Get conversation details
+      description: Retrieves detailed information about a specific conversation including all messages and comments.
+      operationId: getConversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the conversation
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9_-]{8,32}$'
+            minLength: 8
+            maxLength: 32
+            example: "conv_123"
+      responses:
+        '200':
+          description: Conversation details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationDetail'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /messages:
+    post:
+      tags: ["messages"]
+      summary: Send message to conversation
+      description: Sends a new message to a specified conversation for the authenticated user.
+      operationId: sendMessage
+      requestBody:
+        description: Message data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: New message information
+              properties:
+                conversationId:
+                  type: string
+                  description: Target conversation identifier
+                  example: "conv_123"
+                  pattern: '^[a-zA-Z0-9_-]{8,32}$'
+                  minLength: 8
+                  maxLength: 32
+                body:
+                  type: string
+                  description: Message content
+                  example: "Hello everyone!"
+                  minLength: 1
+                  maxLength: 2000
+              required:
+                - conversationId
+                - body
+      responses:
+        '201':
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /messages/{id}/forward:
+    post:
+      tags: ["messages"]
+      summary: Forward message to another conversation
+      description: Forwards an existing message to another conversation for the authenticated user.
+      operationId: forwardMessage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the message to forward
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9_-]{8,32}$'
+            minLength: 8
+            maxLength: 32
+            example: "msg_123"
+      requestBody:
+        description: Forward destination information
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Forward destination information
+              properties:
+                conversationId:
+                  type: string
+                  description: Target conversation identifier
+                  example: "conv_456"
+                  pattern: '^[a-zA-Z0-9_-]{8,32}$'
+                  minLength: 8
+                  maxLength: 32
+              required:
+                - conversationId
+      responses:
+        '200':
+          description: Message forwarded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Message or conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /messages/{id}/comment:
+    post:
+      tags: ["messages"]
+      summary: Add comment to message
+      description: Adds a comment to an existing message for the authenticated user.
+      operationId: commentMessage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the message to comment on
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9_-]{8,32}$'
+            minLength: 8
+            maxLength: 32
+            example: "msg_123"
+      requestBody:
+        description: Comment data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Comment information
+              properties:
+                comment:
+                  type: string
+                  description: Comment content
+                  example: "Great point!"
+                  minLength: 1
+                  maxLength: 500
+              required:
+                - comment
+      responses:
+        '200':
+          description: Comment added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Message not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /messages/{id}/uncomment:
+    post:
+      tags: ["messages"]
+      summary: Remove comment from message
+      description: Removes a comment from a message for the authenticated user.
+      operationId: uncommentMessage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the message to remove comment from
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9_-]{8,32}$'
+            minLength: 8
+            maxLength: 32
+            example: "msg_123"
+      responses:
+        '200':
+          description: Comment removed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Success response
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Comment removed successfully"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Message or comment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /messages/{id}:
+    delete:
+      tags: ["messages"]
+      summary: Delete message
+      description: Deletes a message for the authenticated user. Only the message author can delete their own messages.
+      operationId: deleteMessage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the message to delete
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9_-]{8,32}$'
+            minLength: 8
+            maxLength: 32
+            example: "msg_123"
+      responses:
+        '204':
+          description: Message deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Message not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /groups/{id}/add:
+    post:
+      tags: ["groups"]
+      summary: Add user to group
+      description: Adds a user to a group conversation for the authenticated user.
+      operationId: addToGroup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Group conversation identifier
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9_-]{8,32}$'
+            minLength: 8
+            maxLength: 32
+            example: "conv_123"
+      requestBody:
+        description: User addition information
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: User addition information
+              properties:
+                userId:
+                  type: string
+                  description: User identifier to add to the group
+                  example: "user_123"
+                  pattern: '^[a-zA-Z0-9_-]{8,32}$'
+                  minLength: 8
+                  maxLength: 32
+              required:
+                - userId
+      responses:
+        '200':
+          description: User added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Success response
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                    example: "User added to group successfully"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Group or user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /groups/{id}/leave:
+    post:
+      tags: ["groups"]
+      summary: Leave group conversation
+      description: Removes the current authenticated user from a group conversation.
+      operationId: leaveGroup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Group conversation identifier
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9_-]{8,32}$'
+            minLength: 8
+            maxLength: 32
+            example: "conv_123"
+      responses:
+        '200':
+          description: User left group successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Success response
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Left group successfully"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Group not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /groups/{id}/name:
+    put:
+      tags: ["groups"]
+      summary: Update group name
+      description: Updates the name of a group conversation for the authenticated user.
+      operationId: setGroupName
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Group conversation identifier
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9_-]{8,32}$'
+            minLength: 8
+            maxLength: 32
+            example: "conv_123"
+      requestBody:
+        description: Group name update information
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Group name update information
+              properties:
+                name:
+                  type: string
+                  description: New group name
+                  example: "Updated Group Name"
+                  minLength: 1
+                  maxLength: 100
+              required:
+                - name
+      responses:
+        '200':
+          description: Group name updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Success response
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Group name updated successfully"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Group not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /groups/{id}/photo:
+    put:
+      tags: ["groups"]
+      summary: Update group photo
+      description: Updates the photo of a group conversation for the authenticated user.
+      operationId: setGroupPhoto
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Group conversation identifier
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9_-]{8,32}$'
+            minLength: 8
+            maxLength: 32
+            example: "conv_123"
+      requestBody:
+        description: Group photo upload information
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              description: Group photo upload information
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Image file (JPEG, PNG, GIF) for group photo
+              required:
+                - file
+      responses:
+        '200':
+          description: Group photo updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Success response with photo URL
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Group photo updated successfully"
+                  photoUrl:
+                    type: string
+                    description: URL of the uploaded photo
+                    example: "/photos/group_123.jpg"
+                    pattern: '^/photos/group_[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif)$'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Group not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
-  schemas:
-    StatusInfo:
-      title: Status Info
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - info
-            - warning
-            - critical
-            - ""
-        title: { type: string }
-        message: { type: string }
-        url: { type: string }
-
-  responses:
-    Unauthorized:
-      description: The access token is missing or it's expired
-    BadRequest:
-      description: The request was not compliant with the documentation (eg. missing fields, etc)
-    InternalServerError:
-      description: The server encountered an internal error. Further info in server logs
-
   securitySchemes:
-    LegacyAuth:
-      type: apiKey
-      in: header
-      name: X-App-Token
-      description: |-
-        App session token value. This value is sent by the server in the login
-        and session refresh APIs.
-
-  parameters:
-    XAppVersion:
-      schema:
-        type: string
-        pattern: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
-        minLength: 1
-        maxLength: 10
-      name: X-App-Version
-      in: header
-      required: true
-      description: App human readable version ("semantic version" format)
-      allowEmptyValue: false
-    XAppBuild:
-      schema: { type: integer }
-      name: X-App-Build
-      in: header
-      required: true
-      description: App build number
-      allowEmptyValue: false
-    XAppLanguage:
-      schema:
-        type: string
-        pattern: '^[a-z]{2}([-_][A-Z]{2})?$'
-        minLength: 2
-        maxLength: 5
-      name: X-App-Language
-      in: header
-      required: true
-      description: App language in ISO 639-1 format
-      allowEmptyValue: false
-    XAppPlatform:
-      schema:
-        type: string
-        enum: [ios, android]
-      name: X-App-Platform
-      in: header
-      required: true
-      description: App operating system / platform
-      allowEmptyValue: false
-    cat:
-      schema:
-        type: string
-        pattern: '^[a-zA-Z]+$'
-        minLength: 3
-        maxLength: 10
-      name: cat
-      in: path
-      required: true
-      description: Cat
-      allowEmptyValue: false
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authentication. Include this token in the Authorization header as 'Bearer {token}'
+  schemas:
+    Error:
+      type: object
+      description: Standard error response format
+      properties:
+        error:
+          type: string
+          description: Error message describing what went wrong
+          example: "An error occurred"
+      required:
+        - error
+    Success:
+      type: object
+      description: Standard success response format
+      properties:
+        message:
+          type: string
+          description: Success message describing the completed action
+          example: "Operation completed successfully"
+      required:
+        - message
+    User:
+      type: object
+      description: User information
+      properties:
+        id:
+          type: string
+          description: Unique user identifier
+          example: "user_123"
+          pattern: '^[a-zA-Z0-9_-]{8,32}$'
+          minLength: 8
+          maxLength: 32
+        username:
+          type: string
+          description: User's display name
+          example: "john_doe"
+          pattern: '^[a-zA-Z0-9_]{3,16}$'
+          minLength: 3
+          maxLength: 16
+        photo:
+          type: string
+          description: URL to user's profile photo
+          example: "/photos/user_123.jpg"
+          pattern: '^/photos/user_[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif)$'
+      required:
+        - id
+        - username
+    Conversation:
+      type: object
+      description: Basic conversation information
+      properties:
+        id:
+          type: string
+          description: Unique conversation identifier
+          example: "conv_123"
+          pattern: '^[a-zA-Z0-9_-]{8,32}$'
+          minLength: 8
+          maxLength: 32
+        name:
+          type: string
+          description: Conversation name
+          example: "My Chat"
+          minLength: 1
+          maxLength: 100
+        type:
+          type: string
+          description: Conversation type
+          example: "group"
+          enum: ["direct", "group"]
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+          example: "2023-01-01T12:00:00Z"
+      required:
+        - id
+        - name
+        - type
+    ConversationDetail:
+      type: object
+      description: Detailed conversation information including messages
+      properties:
+        id:
+          type: string
+          description: Unique conversation identifier
+          example: "conv_123"
+          pattern: '^[a-zA-Z0-9_-]{8,32}$'
+          minLength: 8
+          maxLength: 32
+        name:
+          type: string
+          description: Conversation name
+          example: "My Chat"
+          minLength: 1
+          maxLength: 100
+        type:
+          type: string
+          description: Conversation type
+          example: "group"
+          enum: ["direct", "group"]
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+          example: "2023-01-01T12:00:00Z"
+        messages:
+          type: array
+          description: Array of messages in the conversation
+          minItems: 0
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/Message'
+      required:
+        - id
+        - name
+        - type
+        - messages
+    Message:
+      type: object
+      description: Message information
+      properties:
+        id:
+          type: string
+          description: Unique message identifier
+          example: "msg_123"
+          pattern: '^[a-zA-Z0-9_-]{8,32}$'
+          minLength: 8
+          maxLength: 32
+        conversationId:
+          type: string
+          description: Conversation identifier this message belongs to
+          example: "conv_123"
+          pattern: '^[a-zA-Z0-9_-]{8,32}$'
+          minLength: 8
+          maxLength: 32
+        author:
+          type: string
+          description: Author user identifier
+          example: "user_456"
+          pattern: '^[a-zA-Z0-9_-]{8,32}$'
+          minLength: 8
+          maxLength: 32
+        body:
+          type: string
+          description: Message content
+          example: "Hello world!"
+          minLength: 1
+          maxLength: 2000
+        timestamp:
+          type: string
+          format: date-time
+          description: Message timestamp
+          example: "2023-01-01T12:00:00Z"
+        comments:
+          type: array
+          description: Array of comments on this message
+          minItems: 0
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Comment'
+      required:
+        - id
+        - conversationId
+        - author
+        - body
+        - timestamp
+    Comment:
+      type: object
+      description: Comment information
+      properties:
+        id:
+          type: string
+          description: Unique comment identifier
+          example: "comment_123"
+          pattern: '^[a-zA-Z0-9_-]{8,32}$'
+          minLength: 8
+          maxLength: 32
+        messageId:
+          type: string
+          description: Message identifier this comment belongs to
+          example: "msg_123"
+          pattern: '^[a-zA-Z0-9_-]{8,32}$'
+          minLength: 8
+          maxLength: 32
+        author:
+          type: string
+          description: Comment author user identifier
+          example: "user_456"
+          pattern: '^[a-zA-Z0-9_-]{8,32}$'
+          minLength: 8
+          maxLength: 32
+        body:
+          type: string
+          description: Comment content
+          example: "Great point!"
+          minLength: 1
+          maxLength: 500
+        timestamp:
+          type: string
+          format: date-time
+          description: Comment timestamp
+          example: "2023-01-01T12:00:00Z"
+      required:
+        - id
+        - messageId
+        - author
+        - body
+        - timestamp
