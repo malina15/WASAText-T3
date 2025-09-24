@@ -15,9 +15,10 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Run the Node.js container with the current directory mounted
+# Enable Yarn via Corepack so template commands (yarn run ...) work out-of-the-box
 docker run --rm -it \
     -v "$SCRIPT_DIR:/app" \
     -w /app \
     -p 5173:5173 \
     node:20 \
-    /bin/bash -lc "cd webui && npm ci || npm install && bash"
+    /bin/bash -lc "corepack enable && cd /app/webui && bash"

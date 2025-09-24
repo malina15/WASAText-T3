@@ -23,7 +23,7 @@ func main() {
 
 	// Initialize service and handlers
 	chatService := service.NewChatService(store)
-	h := api.NewChatHandler(chatService)
+    h := api.NewHandler(chatService)
 
 	// Create router
 	router := httprouter.New()

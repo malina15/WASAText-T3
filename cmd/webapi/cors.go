@@ -21,7 +21,7 @@ func DefaultCORSConfig() *CORSConfig {
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders: []string{"Content-Type", "Authorization", "X-Requested-With"},
-		MaxAge:         "86400",
+        MaxAge:         "1",
 	}
 }
 
