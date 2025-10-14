@@ -7,9 +7,18 @@ RUN go mod download
 ARG WEBUI_TAG
 RUN if [ "$WEBUI_TAG" = "1" ]; then go build -tags webui -o /out/webapi ./cmd/webapi; else go build -o /out/webapi ./cmd/webapi; fi
 
-FROM gcr.io/distroless/base-debian12
+# Use debian-based image instead of distroless for better file system support
+FROM debian:12-slim
 WORKDIR /app
 COPY --from=build /out/webapi /app/webapi
+COPY --from=build /app/demo/config.yaml /app/demo/config.yaml
+
+# Create data directory for database with proper permissions
+RUN mkdir -p /app/data /app/demo && chmod 777 /app/data
+
+# Install ca-certificates for HTTPS support
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+
 EXPOSE 8080
-USER 65532:65532
+USER nobody
 ENTRYPOINT ["/app/webapi"]

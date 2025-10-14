@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"new-wasa/service/models"
 	_ "github.com/mattn/go-sqlite3"
+	"new-wasa/service/models"
 )
 
 type ChatStore interface {

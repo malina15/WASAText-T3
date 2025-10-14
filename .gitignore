@@ -9,6 +9,11 @@
 *.test
 *.out
 
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
 # Node
 node_modules/
 webui/node_modules/

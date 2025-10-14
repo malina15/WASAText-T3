@@ -189,7 +189,6 @@ const API_BASE = import.meta.env.VITE_API_URL || (() => {
   return `${window.location.protocol}//${host}:8080`
 })()
 
-console.log('API_BASE computed →', API_BASE)
 
 // State
 const isLoggedIn = ref(false)

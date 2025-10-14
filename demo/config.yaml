@@ -3,10 +3,10 @@
 
 server:
   port: 8080
-  host: "localhost"
+  host: "0.0.0.0"
 
 database:
-  path: "chat.db"
+  path: "/app/data/chat.db"
   driver: "sqlite3"
 
 logging:

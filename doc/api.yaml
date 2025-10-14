@@ -47,7 +47,7 @@ paths:
                 name:
                   type: string
                   description: Username for login
-                  example: "Maria"
+                  example: "MariaUser123"
                   pattern: '^[a-zA-Z0-9_]{3,16}$'
                   minLength: 3
                   maxLength: 16
@@ -65,7 +65,7 @@ paths:
                   identifier:
                     type: string
                     description: Unique identifier token for the user
-                    example: "abcdef012345"
+                    example: "abcdef0123456789"
                     pattern: '^[a-zA-Z0-9]{12,32}$'
                     minLength: 12
                     maxLength: 32
@@ -100,7 +100,7 @@ paths:
                 username:
                   type: string
                   description: New username for the user
-                  example: "newusername"
+                  example: "newusername123"
                   pattern: '^[a-zA-Z0-9_]{3,16}$'
                   minLength: 3
                   maxLength: 16
@@ -175,7 +175,7 @@ paths:
                   photoUrl:
                     type: string
                     description: URL of the uploaded photo
-                    example: "/photos/user_123.jpg"
+                    example: "/photos/user_abc123def456.jpg"
                     pattern: '^/photos/user_[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif)$'
         '400':
           description: Bad request
@@ -244,7 +244,7 @@ paths:
                 name:
                   type: string
                   description: Name of the conversation
-                  example: "New Chat"
+                  example: "New Chat Group Discussion"
                   minLength: 1
                   maxLength: 100
                 type:
@@ -261,7 +261,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Conversation'
+                $ref: '#/components/schemas/ConversationDetail'
         '400':
           description: Bad request
           content:
@@ -297,7 +297,7 @@ paths:
             pattern: '^[a-zA-Z0-9_-]{8,32}$'
             minLength: 8
             maxLength: 32
-            example: "conv_123"
+            example: "conv_abc123def456"
       responses:
         '200':
           description: Conversation details retrieved successfully
@@ -342,7 +342,7 @@ paths:
                 conversationId:
                   type: string
                   description: Target conversation identifier
-                  example: "conv_123"
+                  example: "conv_abc123def456"
                   pattern: '^[a-zA-Z0-9_-]{8,32}$'
                   minLength: 8
                   maxLength: 32
@@ -403,7 +403,7 @@ paths:
             pattern: '^[a-zA-Z0-9_-]{8,32}$'
             minLength: 8
             maxLength: 32
-            example: "msg_123"
+            example: "msg_abc123def456"
       requestBody:
         description: Forward destination information
         required: true
@@ -416,7 +416,7 @@ paths:
                 conversationId:
                   type: string
                   description: Target conversation identifier
-                  example: "conv_456"
+                  example: "conv_def456ghi789"
                   pattern: '^[a-zA-Z0-9_-]{8,32}$'
                   minLength: 8
                   maxLength: 32
@@ -470,7 +470,7 @@ paths:
             pattern: '^[a-zA-Z0-9_-]{8,32}$'
             minLength: 8
             maxLength: 32
-            example: "msg_123"
+            example: "msg_abc123def456"
       requestBody:
         description: Comment data
         required: true
@@ -483,7 +483,7 @@ paths:
                 comment:
                   type: string
                   description: Comment content
-                  example: "Great point!"
+                  example: "Great point! I totally agree with this message!"
                   minLength: 1
                   maxLength: 500
               required:
@@ -536,7 +536,7 @@ paths:
             pattern: '^[a-zA-Z0-9_-]{8,32}$'
             minLength: 8
             maxLength: 32
-            example: "msg_123"
+            example: "msg_abc123def456"
       responses:
         '200':
           description: Comment removed successfully
@@ -591,7 +591,7 @@ paths:
             pattern: '^[a-zA-Z0-9_-]{8,32}$'
             minLength: 8
             maxLength: 32
-            example: "msg_123"
+            example: "msg_abc123def456"
       responses:
         '204':
           description: Message deleted successfully
@@ -630,7 +630,7 @@ paths:
             pattern: '^[a-zA-Z0-9_-]{8,32}$'
             minLength: 8
             maxLength: 32
-            example: "conv_123"
+            example: "conv_abc123def456"
       requestBody:
         description: User addition information
         required: true
@@ -643,7 +643,7 @@ paths:
                 userId:
                   type: string
                   description: User identifier to add to the group
-                  example: "user_123"
+                  example: "user_abc123def456"
                   pattern: '^[a-zA-Z0-9_-]{8,32}$'
                   minLength: 8
                   maxLength: 32
@@ -703,7 +703,7 @@ paths:
             pattern: '^[a-zA-Z0-9_-]{8,32}$'
             minLength: 8
             maxLength: 32
-            example: "conv_123"
+            example: "conv_abc123def456"
       responses:
         '200':
           description: User left group successfully
@@ -752,7 +752,7 @@ paths:
             pattern: '^[a-zA-Z0-9_-]{8,32}$'
             minLength: 8
             maxLength: 32
-            example: "conv_123"
+            example: "conv_abc123def456"
       requestBody:
         description: Group name update information
         required: true
@@ -765,7 +765,7 @@ paths:
                 name:
                   type: string
                   description: New group name
-                  example: "Updated Group Name"
+                  example: "Updated Group Name Discussion"
                   minLength: 1
                   maxLength: 100
               required:
@@ -824,7 +824,7 @@ paths:
             pattern: '^[a-zA-Z0-9_-]{8,32}$'
             minLength: 8
             maxLength: 32
-            example: "conv_123"
+            example: "conv_abc123def456"
       requestBody:
         description: Group photo upload information
         required: true
@@ -856,7 +856,7 @@ paths:
                   photoUrl:
                     type: string
                     description: URL of the uploaded photo
-                    example: "/photos/group_123.jpg"
+                    example: "/photos/group_abc123def456.jpg"
                     pattern: '^/photos/group_[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif)$'
         '400':
           description: Bad request
@@ -901,42 +901,6 @@ components:
           example: "An error occurred"
       required:
         - error
-    Success:
-      type: object
-      description: Standard success response format
-      properties:
-        message:
-          type: string
-          description: Success message describing the completed action
-          example: "Operation completed successfully"
-      required:
-        - message
-    User:
-      type: object
-      description: User information
-      properties:
-        id:
-          type: string
-          description: Unique user identifier
-          example: "user_123"
-          pattern: '^[a-zA-Z0-9_-]{8,32}$'
-          minLength: 8
-          maxLength: 32
-        username:
-          type: string
-          description: User's display name
-          example: "john_doe"
-          pattern: '^[a-zA-Z0-9_]{3,16}$'
-          minLength: 3
-          maxLength: 16
-        photo:
-          type: string
-          description: URL to user's profile photo
-          example: "/photos/user_123.jpg"
-          pattern: '^/photos/user_[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif)$'
-      required:
-        - id
-        - username
     Conversation:
       type: object
       description: Basic conversation information
@@ -944,14 +908,14 @@ components:
         id:
           type: string
           description: Unique conversation identifier
-          example: "conv_123"
+          example: "conv_abc123def456"
           pattern: '^[a-zA-Z0-9_-]{8,32}$'
           minLength: 8
           maxLength: 32
         name:
           type: string
           description: Conversation name
-          example: "My Chat"
+          example: "My Chat Room Discussion"
           minLength: 1
           maxLength: 100
         type:
@@ -975,14 +939,14 @@ components:
         id:
           type: string
           description: Unique conversation identifier
-          example: "conv_123"
+          example: "conv_abc123def456"
           pattern: '^[a-zA-Z0-9_-]{8,32}$'
           minLength: 8
           maxLength: 32
         name:
           type: string
           description: Conversation name
-          example: "My Chat"
+          example: "My Chat Room Discussion"
           minLength: 1
           maxLength: 100
         type:
@@ -1014,21 +978,21 @@ components:
         id:
           type: string
           description: Unique message identifier
-          example: "msg_123"
+          example: "msg_abc123def456"
           pattern: '^[a-zA-Z0-9_-]{8,32}$'
           minLength: 8
           maxLength: 32
         conversationId:
           type: string
           description: Conversation identifier this message belongs to
-          example: "conv_123"
+          example: "conv_abc123def456"
           pattern: '^[a-zA-Z0-9_-]{8,32}$'
           minLength: 8
           maxLength: 32
         author:
           type: string
           description: Author user identifier
-          example: "user_456"
+          example: "user_abc123def456"
           pattern: '^[a-zA-Z0-9_-]{8,32}$'
           minLength: 8
           maxLength: 32
@@ -1063,21 +1027,21 @@ components:
         id:
           type: string
           description: Unique comment identifier
-          example: "comment_123"
+          example: "comment_abc123def456"
           pattern: '^[a-zA-Z0-9_-]{8,32}$'
           minLength: 8
           maxLength: 32
         messageId:
           type: string
           description: Message identifier this comment belongs to
-          example: "msg_123"
+          example: "msg_abc123def456"
           pattern: '^[a-zA-Z0-9_-]{8,32}$'
           minLength: 8
           maxLength: 32
         author:
           type: string
           description: Comment author user identifier
-          example: "user_456"
+          example: "user_abc123def456"
           pattern: '^[a-zA-Z0-9_-]{8,32}$'
           minLength: 8
           maxLength: 32

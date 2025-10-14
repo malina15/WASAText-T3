@@ -24,7 +24,7 @@ func registerWebUI() {
 
 	// Serve static files
 	fileServer := http.FileServer(http.FS(webuiFS))
-	
+
 	// Handle all routes that don't match API endpoints
 	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Try to serve the file, if not found serve index.html for SPA routing

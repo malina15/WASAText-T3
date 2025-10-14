@@ -414,7 +414,7 @@ func (h *ChatHandler) SetMyPhoto(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
-		"message":   "Photo updated successfully",
+		"message":  "Photo updated successfully",
 		"photoUrl": fmt.Sprintf("/photos/user_%s.jpg", userID),
 	})
 }
@@ -461,7 +461,7 @@ func (h *ChatHandler) SetGroupPhoto(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
-		"message":   "Group photo updated successfully",
+		"message":  "Group photo updated successfully",
 		"photoUrl": fmt.Sprintf("/photos/group_%s.jpg", groupID),
 	})
 }

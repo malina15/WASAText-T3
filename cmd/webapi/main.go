@@ -14,7 +14,7 @@ import (
 func main() {
 	// Load configuration
 	config := LoadConfig()
-	
+
 	// Initialize SQLite store
 	store, err := store.NewSQLiteChatStore(config.Database.Path)
 	if err != nil {
@@ -23,7 +23,7 @@ func main() {
 
 	// Initialize service and handlers
 	chatService := service.NewChatService(store)
-    h := api.NewHandler(chatService)
+	h := api.NewHandler(chatService)
 
 	// Create router
 	router := httprouter.New()
@@ -66,41 +66,41 @@ func main() {
 	// Protected routes (auth required)
 	router.PUT("/user/username", protectedWrapper(h.SetMyUserName))
 	router.OPTIONS("/user/username", corsWrapper(func(w http.ResponseWriter, r *http.Request) {}))
-	
+
 	router.POST("/conversations", protectedWrapper(h.CreateConversation))
 	router.GET("/conversations", protectedWrapper(h.GetMyConversations))
 	router.OPTIONS("/conversations", corsWrapper(func(w http.ResponseWriter, r *http.Request) {}))
-	
+
 	router.GET("/conversations/:id", protectedWrapper(h.GetConversation))
 	router.OPTIONS("/conversations/:id", corsWrapper(func(w http.ResponseWriter, r *http.Request) {}))
-	
+
 	router.POST("/messages", protectedWrapper(h.SendMessage))
 	router.OPTIONS("/messages", corsWrapper(func(w http.ResponseWriter, r *http.Request) {}))
-	
+
 	router.POST("/messages/:id/forward", protectedWrapper(h.ForwardMessage))
 	router.OPTIONS("/messages/:id/forward", corsWrapper(func(w http.ResponseWriter, r *http.Request) {}))
-	
+
 	router.POST("/messages/:id/comment", protectedWrapper(h.CommentMessage))
 	router.OPTIONS("/messages/:id/comment", corsWrapper(func(w http.ResponseWriter, r *http.Request) {}))
-	
+
 	router.POST("/messages/:id/uncomment", protectedWrapper(h.UncommentMessage))
 	router.OPTIONS("/messages/:id/uncomment", corsWrapper(func(w http.ResponseWriter, r *http.Request) {}))
-	
+
 	router.DELETE("/messages/:id", protectedWrapper(h.DeleteMessage))
 	router.OPTIONS("/messages/:id", corsWrapper(func(w http.ResponseWriter, r *http.Request) {}))
-	
+
 	router.POST("/groups/:id/add", protectedWrapper(h.AddToGroup))
 	router.OPTIONS("/groups/:id/add", corsWrapper(func(w http.ResponseWriter, r *http.Request) {}))
-	
+
 	router.POST("/groups/:id/leave", protectedWrapper(h.LeaveGroup))
 	router.OPTIONS("/groups/:id/leave", corsWrapper(func(w http.ResponseWriter, r *http.Request) {}))
-	
+
 	router.PUT("/groups/:id/name", protectedWrapper(h.SetGroupName))
 	router.OPTIONS("/groups/:id/name", corsWrapper(func(w http.ResponseWriter, r *http.Request) {}))
-	
+
 	router.PUT("/user/photo", protectedWrapper(h.SetMyPhoto))
 	router.OPTIONS("/user/photo", corsWrapper(func(w http.ResponseWriter, r *http.Request) {}))
-	
+
 	router.PUT("/groups/:id/photo", protectedWrapper(h.SetGroupPhoto))
 	router.OPTIONS("/groups/:id/photo", corsWrapper(func(w http.ResponseWriter, r *http.Request) {}))
 

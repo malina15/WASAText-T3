@@ -14,6 +14,28 @@ This repository follows the Fantastic Coffee (Decaffeinated) template structure 
 
 Template reference: https://github.com/sapienzaapps/fantastic-coffee-decaffeinated
 
+## Quick Start with Docker Compose (Recommended)
+
+The easiest way to run the complete application (backend + frontend):
+
+```bash
+# Clone the repository
+git clone [repository-url]
+cd new-wasa
+
+# Start everything with Docker Compose
+docker-compose up --build
+
+# Access the application:
+# - Frontend: http://localhost:8081
+# - Backend API: http://localhost:8080
+```
+
+To stop:
+```bash
+docker-compose down
+```
+
 ## How to build
 
 Backend only:
