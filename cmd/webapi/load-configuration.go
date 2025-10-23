@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 )
@@ -39,7 +38,7 @@ func DefaultConfig() *Config {
 			Path   string `yaml:"path"`
 			Driver string `yaml:"driver"`
 		}{
-			Path:   "chat.db",
+			Path:   "./data/chat.db", // Use relative path for local development
 			Driver: "sqlite3",
 		},
 		Logging: struct {
@@ -54,65 +53,30 @@ func DefaultConfig() *Config {
 
 // LoadConfig loads configuration from file or returns default
 func LoadConfig() *Config {
-	// Try to load from demo/config.yaml first
-	configPath := "demo/config.yaml"
-	if _, err := os.Stat(configPath); err == nil {
-		data, err := ioutil.ReadFile(configPath)
-		if err != nil {
-			log.Printf("Warning: Could not read config file %s: %v", configPath, err)
-			return DefaultConfig()
-		}
-
-		var config Config
-		if err := yaml.Unmarshal(data, &config); err != nil {
-			log.Printf("Warning: Could not parse config file %s: %v", configPath, err)
-			return DefaultConfig()
-		}
-
-		log.Printf("Loaded configuration from %s", configPath)
-		return &config
-	}
-
-	// Try to load from current directory
-	configPath = "config.yaml"
-	if _, err := os.Stat(configPath); err == nil {
-		data, err := ioutil.ReadFile(configPath)
-		if err != nil {
-			log.Printf("Warning: Could not read config file %s: %v", configPath, err)
-			return DefaultConfig()
-		}
-
-		var config Config
-		if err := yaml.Unmarshal(data, &config); err != nil {
-			log.Printf("Warning: Could not parse config file %s: %v", configPath, err)
-			return DefaultConfig()
-		}
-
-		log.Printf("Loaded configuration from %s", configPath)
-		return &config
-	}
-
-	// Try to load from absolute path
-	absPath, err := filepath.Abs("demo/config.yaml")
-	if err == nil {
-		if _, err := os.Stat(absPath); err == nil {
-			data, err := ioutil.ReadFile(absPath)
+	// For local development, use default config to avoid Docker paths
+	// Only use demo/config.yaml in Docker environment
+	if os.Getenv("DOCKER_ENV") == "true" {
+		// Try to load from demo/config.yaml first (for Docker)
+		configPath := "demo/config.yaml"
+		if _, err := os.Stat(configPath); err == nil {
+			data, err := ioutil.ReadFile(configPath)
 			if err != nil {
-				log.Printf("Warning: Could not read config file %s: %v", absPath, err)
+				log.Printf("Warning: Could not read config file %s: %v", configPath, err)
 				return DefaultConfig()
 			}
 
 			var config Config
 			if err := yaml.Unmarshal(data, &config); err != nil {
-				log.Printf("Warning: Could not parse config file %s: %v", absPath, err)
+				log.Printf("Warning: Could not parse config file %s: %v", configPath, err)
 				return DefaultConfig()
 			}
 
-			log.Printf("Loaded configuration from %s", absPath)
+			log.Printf("Loaded configuration from %s", configPath)
 			return &config
 		}
 	}
 
-	log.Printf("No config file found, using default configuration")
+	// For local development, use default config
+	log.Printf("Using default configuration for local development")
 	return DefaultConfig()
 }

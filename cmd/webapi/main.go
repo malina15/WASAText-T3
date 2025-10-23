@@ -16,10 +16,12 @@ func main() {
 	config := LoadConfig()
 
 	// Initialize SQLite store
+	log.Printf("Initializing database at: %s", config.Database.Path)
 	store, err := store.NewSQLiteChatStore(config.Database.Path)
 	if err != nil {
 		log.Fatal("Failed to initialize store:", err)
 	}
+	log.Printf("Database initialized successfully")
 
 	// Initialize service and handlers
 	chatService := service.NewChatService(store)

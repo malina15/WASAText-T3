@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 
@@ -32,16 +33,20 @@ func NewChatHandler(service *service.ChatService) *ChatHandler {
 func (h *ChatHandler) DoLogin(w http.ResponseWriter, r *http.Request) {
 	var req models.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("Login request decode error: %v", err)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
 
+	log.Printf("Login attempt for user: %s", req.Name)
 	response, err := h.service.Login(req.Name)
 	if err != nil {
+		log.Printf("Login service error: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
+	log.Printf("Login successful for user: %s", req.Name)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)

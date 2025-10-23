@@ -3,6 +3,8 @@ package store
 import (
 	"database/sql"
 	"fmt"
+	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -51,14 +53,20 @@ type SQLiteChatStore struct {
 }
 
 func NewSQLiteChatStore(dbPath string) (*SQLiteChatStore, error) {
+	// Create directory if it doesn't exist
+	dir := filepath.Dir(dbPath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return nil, fmt.Errorf("failed to create database directory: %w", err)
+	}
+
 	db, err := sql.Open("sqlite3", dbPath+"?_foreign_keys=1")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
 	store := &SQLiteChatStore{db: db}
 	if err := store.initTables(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to initialize tables: %w", err)
 	}
 
 	return store, nil
