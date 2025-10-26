@@ -51,6 +51,8 @@ paths:
                   pattern: '^[a-zA-Z0-9_]{3,16}$'
                   minLength: 3
                   maxLength: 16
+                  minLength: 3
+                  maxLength: 16
               required:
                 - name
       responses:
@@ -67,7 +69,13 @@ paths:
                     description: Unique identifier token for the user
                     example: "abcdef0123456789"
                     pattern: '^[a-zA-Z0-9]{12,32}$'
-                    minLength: 12
+                    minLength: 1
+          maxLength: 2000
+          maxLength: 1002
+                    maxLength: 32
+                    minLength: 1
+          maxLength: 2000
+          maxLength: 1002
                     maxLength: 32
         '400':
           description: Bad request - invalid input
@@ -104,6 +112,8 @@ paths:
                   pattern: '^[a-zA-Z0-9_]{3,16}$'
                   minLength: 3
                   maxLength: 16
+                  minLength: 3
+                  maxLength: 16
               required:
                 - username
       responses:
@@ -119,6 +129,10 @@ paths:
                     type: string
                     description: Success message
                     example: "Username updated successfully"
+                    minLength: 1
+          maxLength: 2000
+          maxLength: 100
+                    maxLength: 200
         '400':
           description: Bad request
           content:
@@ -172,10 +186,14 @@ paths:
                     type: string
                     description: Success message
                     example: "Photo updated successfully"
+                    minLength: 1
+          maxLength: 2000
+          maxLength: 100
+                    maxLength: 200
                   photoUrl:
                     type: string
                     description: URL of the uploaded photo
-                    example: "/photos/user_abc123def456.jpg"
+                    example: "/photos/user_abc123-def456.jpg"
                     pattern: '^/photos/user_[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif)$'
         '400':
           description: Bad request
@@ -246,12 +264,19 @@ paths:
                   description: Name of the conversation
                   example: "New Chat Group Discussion"
                   minLength: 1
+          maxLength: 2000
+          maxLength: 100
+                  maxLength: 100
                   maxLength: 100
                 type:
                   type: string
                   description: Type of conversation
                   example: "group"
                   enum: ["direct", "group"]
+          minLength: 4
+          maxLength: 6
+                  minLength: 4
+                  maxLength: 6
                   default: "group"
               required:
                 - name
@@ -351,6 +376,9 @@ paths:
                   description: Message content
                   example: "Hello everyone!"
                   minLength: 1
+          maxLength: 2000
+          maxLength: 100
+                  maxLength: 2000
                   maxLength: 2000
               required:
                 - conversationId
@@ -485,6 +513,9 @@ paths:
                   description: Comment content
                   example: "Great point! I totally agree with this message!"
                   minLength: 1
+          maxLength: 2000
+          maxLength: 100
+                  maxLength: 500
                   maxLength: 500
               required:
                 - comment
@@ -550,6 +581,10 @@ paths:
                     type: string
                     description: Success message
                     example: "Comment removed successfully"
+                    minLength: 1
+          maxLength: 2000
+          maxLength: 100
+                    maxLength: 200
         '400':
           description: Bad request
           content:
@@ -662,6 +697,10 @@ paths:
                     type: string
                     description: Success message
                     example: "User added to group successfully"
+                    minLength: 1
+          maxLength: 2000
+          maxLength: 100
+                    maxLength: 200
         '400':
           description: Bad request
           content:
@@ -717,6 +756,10 @@ paths:
                     type: string
                     description: Success message
                     example: "Left group successfully"
+                    minLength: 1
+          maxLength: 2000
+          maxLength: 100
+                    maxLength: 200
         '401':
           description: Unauthorized
           content:
@@ -767,6 +810,9 @@ paths:
                   description: New group name
                   example: "Updated Group Name Discussion"
                   minLength: 1
+          maxLength: 2000
+          maxLength: 100
+                  maxLength: 100
                   maxLength: 100
               required:
                 - name
@@ -783,6 +829,10 @@ paths:
                     type: string
                     description: Success message
                     example: "Group name updated successfully"
+                    minLength: 1
+          maxLength: 2000
+          maxLength: 100
+                    maxLength: 200
         '400':
           description: Bad request
           content:
@@ -853,10 +903,14 @@ paths:
                     type: string
                     description: Success message
                     example: "Group photo updated successfully"
+                    minLength: 1
+          maxLength: 2000
+          maxLength: 100
+                    maxLength: 200
                   photoUrl:
                     type: string
                     description: URL of the uploaded photo
-                    example: "/photos/group_abc123def456.jpg"
+                    example: "/photos/group_abc123-def456.jpg"
                     pattern: '^/photos/group_[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif)$'
         '400':
           description: Bad request
@@ -895,10 +949,14 @@ components:
       type: object
       description: Standard error response format
       properties:
-        error:
-          type: string
-          description: Error message describing what went wrong
-          example: "An error occurred"
+                error:
+                  type: string
+                  description: Error message describing what went wrong
+                  example: "An error occurred"
+                  minLength: 1
+          maxLength: 2000
+          maxLength: 100
+                  maxLength: 500
       required:
         - error
     Conversation:
@@ -917,12 +975,16 @@ components:
           description: Conversation name
           example: "My Chat Room Discussion"
           minLength: 1
+          maxLength: 2000
+          maxLength: 100
           maxLength: 100
         type:
           type: string
           description: Conversation type
           example: "group"
           enum: ["direct", "group"]
+          minLength: 4
+          maxLength: 6
         createdAt:
           type: string
           format: date-time
@@ -948,12 +1010,16 @@ components:
           description: Conversation name
           example: "My Chat Room Discussion"
           minLength: 1
+          maxLength: 2000
+          maxLength: 100
           maxLength: 100
         type:
           type: string
           description: Conversation type
           example: "group"
           enum: ["direct", "group"]
+          minLength: 4
+          maxLength: 6
         createdAt:
           type: string
           format: date-time
@@ -1001,6 +1067,8 @@ components:
           description: Message content
           example: "Hello world!"
           minLength: 1
+          maxLength: 2000
+          maxLength: 100
           maxLength: 2000
         timestamp:
           type: string
@@ -1050,6 +1118,8 @@ components:
           description: Comment content
           example: "Great point!"
           minLength: 1
+          maxLength: 500
+          maxLength: 100
           maxLength: 500
         timestamp:
           type: string

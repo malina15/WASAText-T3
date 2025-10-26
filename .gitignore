@@ -8,6 +8,8 @@
 *.dylib
 *.test
 *.out
+/webapi
+/healthcheck
 
 # Database files
 *.db
