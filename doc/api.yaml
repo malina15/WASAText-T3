@@ -179,8 +179,10 @@ paths:
                   photoUrl:
                     type: string
                     description: URL of the uploaded photo
-                    example: "/photos/user_abc123-def456.jpg"
+                    example: "/photos/user_abc123_def456.jpg"
                     pattern: '^/photos/user_[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif)$'
+                    minLength: 15
+                    maxLength: 100
         '400':
           description: Bad request
           content:
@@ -358,6 +360,7 @@ paths:
                   example: "Hello everyone!"
                   minLength: 1
                   maxLength: 2000
+                  pattern: '^.+$'
               required:
                 - conversationId
                 - body
@@ -492,6 +495,7 @@ paths:
                   example: "Great point! I totally agree with this message!"
                   minLength: 1
                   maxLength: 500
+                  pattern: '^.+$'
               required:
                 - comment
       responses:
@@ -872,8 +876,10 @@ paths:
                   photoUrl:
                     type: string
                     description: URL of the uploaded photo
-                    example: "/photos/group_abc123-def456.jpg"
+                    example: "/photos/group_abc123_def456.jpg"
                     pattern: '^/photos/group_[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif)$'
+                    minLength: 16
+                    maxLength: 100
         '400':
           description: Bad request
           content:
@@ -943,6 +949,7 @@ components:
           enum: ["direct", "group"]
           minLength: 4
           maxLength: 6
+          pattern: '^(direct|group)$'
         createdAt:
           type: string
           format: date-time
@@ -976,6 +983,7 @@ components:
           enum: ["direct", "group"]
           minLength: 4
           maxLength: 6
+          pattern: '^(direct|group)$'
         createdAt:
           type: string
           format: date-time
@@ -1024,6 +1032,7 @@ components:
           example: "Hello world!"
           minLength: 1
           maxLength: 2000
+          pattern: '^.+$'
         timestamp:
           type: string
           format: date-time
@@ -1073,6 +1082,7 @@ components:
           example: "Great point!"
           minLength: 1
           maxLength: 500
+          pattern: '^.+$'
         timestamp:
           type: string
           format: date-time

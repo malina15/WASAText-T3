@@ -53,30 +53,26 @@ func DefaultConfig() *Config {
 
 // LoadConfig loads configuration from file or returns default
 func LoadConfig() *Config {
-	// For local development, use default config to avoid Docker paths
-	// Only use demo/config.yaml in Docker environment
-	if os.Getenv("DOCKER_ENV") == "true" {
-		// Try to load from demo/config.yaml first (for Docker)
-		configPath := "demo/config.yaml"
-		if _, err := os.Stat(configPath); err == nil {
-			data, err := ioutil.ReadFile(configPath)
-			if err != nil {
-				log.Printf("Warning: Could not read config file %s: %v", configPath, err)
-				return DefaultConfig()
-			}
-
+	// Try to load from demo/config.yaml first (for Docker)
+	configPath := "demo/config.yaml"
+	if _, err := os.Stat(configPath); err == nil {
+		data, err := ioutil.ReadFile(configPath)
+		if err == nil {
 			var config Config
-			if err := yaml.Unmarshal(data, &config); err != nil {
-				log.Printf("Warning: Could not parse config file %s: %v", configPath, err)
-				return DefaultConfig()
+			if err := yaml.Unmarshal(data, &config); err == nil {
+				log.Printf("Loaded configuration from %s", configPath)
+				return &config
 			}
-
-			log.Printf("Loaded configuration from %s", configPath)
-			return &config
 		}
 	}
 
-	// For local development, use default config
-	log.Printf("Using default configuration for local development")
-	return DefaultConfig()
+	// Check if we're in Docker - if so, use 0.0.0.0, otherwise localhost
+	config := DefaultConfig()
+	if os.Getenv("DOCKER_ENV") == "true" || os.Getenv("CONTAINER") == "true" {
+		config.Server.Host = "0.0.0.0"
+		log.Printf("Using Docker configuration (0.0.0.0)")
+	} else {
+		log.Printf("Using default configuration for local development")
+	}
+	return config
 }

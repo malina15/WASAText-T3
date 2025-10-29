@@ -49,7 +49,9 @@ func (h *ChatHandler) DoLogin(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Login successful for user: %s", req.Name)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("Failed to encode login response: %v", err)
+	}
 }
 
 // SetMyUserName handles username update
@@ -75,7 +77,9 @@ func (h *ChatHandler) SetMyUserName(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Username updated successfully"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"message": "Username updated successfully"}); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // GetMyConversations handles getting user conversations
@@ -94,7 +98,9 @@ func (h *ChatHandler) GetMyConversations(w http.ResponseWriter, r *http.Request)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(conversations)
+	if err := json.NewEncoder(w).Encode(conversations); err != nil {
+		log.Printf("Failed to encode conversations: %v", err)
+	}
 }
 
 // GetConversation handles getting a specific conversation
@@ -119,7 +125,9 @@ func (h *ChatHandler) GetConversation(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(conversation)
+	if err := json.NewEncoder(w).Encode(conversation); err != nil {
+		log.Printf("Failed to encode conversation: %v", err)
+	}
 }
 
 // CreateConversation handles creating a new conversation
@@ -152,7 +160,9 @@ func (h *ChatHandler) CreateConversation(w http.ResponseWriter, r *http.Request)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(conversation)
+	if err := json.NewEncoder(w).Encode(conversation); err != nil {
+		log.Printf("Failed to encode conversation: %v", err)
+	}
 }
 
 // SendMessage handles sending a message
@@ -180,7 +190,9 @@ func (h *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(message)
+	if err := json.NewEncoder(w).Encode(message); err != nil {
+		log.Printf("Failed to encode message: %v", err)
+	}
 }
 
 // ForwardMessage handles forwarding a message
@@ -246,7 +258,9 @@ func (h *ChatHandler) CommentMessage(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(comment)
+	if err := json.NewEncoder(w).Encode(comment); err != nil {
+		log.Printf("Failed to encode comment: %v", err)
+	}
 }
 
 // UncommentMessage handles removing a comment from a message
@@ -270,7 +284,9 @@ func (h *ChatHandler) UncommentMessage(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Comment removed successfully"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"message": "Comment removed successfully"}); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // DeleteMessage handles deleting a message
@@ -324,7 +340,9 @@ func (h *ChatHandler) AddToGroup(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "User added to group successfully"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"message": "User added to group successfully"}); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // LeaveGroup handles leaving a group
@@ -348,7 +366,9 @@ func (h *ChatHandler) LeaveGroup(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Left group successfully"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"message": "Left group successfully"}); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // SetGroupName handles updating a group's name
@@ -380,7 +400,9 @@ func (h *ChatHandler) SetGroupName(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Group name updated successfully"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"message": "Group name updated successfully"}); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // SetMyPhoto handles updating user's profile photo
@@ -418,10 +440,12 @@ func (h *ChatHandler) SetMyPhoto(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
+	if err := json.NewEncoder(w).Encode(map[string]string{
 		"message":  "Photo updated successfully",
 		"photoUrl": fmt.Sprintf("/photos/user_%s.jpg", userID),
-	})
+	}); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 // SetGroupPhoto handles updating a group's photo
@@ -465,8 +489,10 @@ func (h *ChatHandler) SetGroupPhoto(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
+	if err := json.NewEncoder(w).Encode(map[string]string{
 		"message":  "Group photo updated successfully",
 		"photoUrl": fmt.Sprintf("/photos/group_%s.jpg", groupID),
-	})
+	}); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }

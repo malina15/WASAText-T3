@@ -308,6 +308,9 @@ func (s *SQLiteChatStore) GetConversations(userID string) ([]models.Conversation
 		}
 		conversations = append(conversations, conv)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 
 	return conversations, nil
 }
@@ -389,6 +392,9 @@ func (s *SQLiteChatStore) GetConversationMessages(conversationID string) ([]mode
 			return nil, err
 		}
 		messages = append(messages, message)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return messages, nil
@@ -512,6 +518,9 @@ func (s *SQLiteChatStore) GetGroupMembers(groupID string) ([]string, error) {
 			return nil, err
 		}
 		userIDs = append(userIDs, userID)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return userIDs, nil

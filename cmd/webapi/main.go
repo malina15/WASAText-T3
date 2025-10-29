@@ -19,7 +19,8 @@ func main() {
 	log.Printf("Initializing database at: %s", config.Database.Path)
 	store, err := store.NewSQLiteChatStore(config.Database.Path)
 	if err != nil {
-		log.Fatal("Failed to initialize store:", err)
+		log.Printf("Failed to initialize store: %v", err)
+		return
 	}
 	log.Printf("Database initialized successfully")
 
@@ -111,5 +112,8 @@ func main() {
 
 	serverAddr := config.Server.Host + ":" + config.Server.Port
 	log.Printf("Server listening on %s", serverAddr)
-	log.Fatal(http.ListenAndServe(serverAddr, router))
+	if err := http.ListenAndServe(serverAddr, router); err != nil {
+		log.Printf("Server error: %v", err)
+		return
+	}
 }
