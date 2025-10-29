@@ -225,7 +225,9 @@ func (h *ChatHandler) ForwardMessage(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(message)
+	if err := json.NewEncoder(w).Encode(message); err != nil {
+		log.Printf("Failed to encode message: %v", err)
+	}
 }
 
 // CommentMessage handles commenting on a message

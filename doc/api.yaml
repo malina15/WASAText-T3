@@ -47,8 +47,8 @@ paths:
                 name:
                   type: string
                   description: Username for login
-                  example: "MariaUser123"
-                  pattern: '^[a-zA-Z0-9_]{3,16}$'
+                  example: "Maria"
+                  pattern: '^.*?$'
                   minLength: 3
                   maxLength: 16
               required:
@@ -65,8 +65,7 @@ paths:
                   identifier:
                     type: string
                     description: Unique identifier token for the user
-                    example: "abcdef0123456789"
-                    pattern: '^[a-zA-Z0-9]{12,32}$'
+                    example: "abcdef012345"
                     minLength: 1
                     maxLength: 32
         '400':
