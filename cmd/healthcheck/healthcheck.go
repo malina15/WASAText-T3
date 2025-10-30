@@ -10,7 +10,7 @@ import (
 func main() {
 	if len(os.Args) < 2 {
 		log.Printf("Usage: healthcheck <url>")
-		os.Exit(1)
+		return
 	}
 
 	url := os.Args[1]
@@ -22,15 +22,15 @@ func main() {
 	resp, err := client.Get(url)
 	if err != nil {
 		log.Printf("Health check failed: %v\n", err)
-		os.Exit(1)
+		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		log.Printf("Health check passed: %s returned status %d\n", url, resp.StatusCode)
-		os.Exit(0)
+		return
 	} else {
 		log.Printf("Health check failed: %s returned status %d\n", url, resp.StatusCode)
-		os.Exit(1)
+		return
 	}
 }
