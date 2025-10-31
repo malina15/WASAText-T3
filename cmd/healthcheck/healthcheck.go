@@ -1,36 +1,48 @@
+/*
+Healthcheck is a simple program that sends an HTTP request to the local host (self) to a configured port number.
+It's used in environment where you need a simple probe for health checks (e.g., an empty container in docker).
+The probe URL is http://localhost:3000/liveness . Only the port can be changed.
+
+Usage:
+
+	healthcheck [flags]
+
+The flags are:
+
+	-port <1-65535>
+		Change the port where the request is sent.
+
+Return values (exit codes):
+
+	0
+		The request was successful (HTTP 200 or HTTP 204)
+
+	> 0
+		The request was not successful (connection error or unexpected HTTP status code)
+*/
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
-	"os"
-	"time"
+	"strconv"
 )
 
 func main() {
-	if len(os.Args) < 2 {
-		log.Printf("Usage: healthcheck <url>")
-		return
-	}
+	var port = flag.Int("port", 3000, "HTTP port for healthcheck")
 
-	url := os.Args[1]
+	flag.Parse()
 
-	client := &http.Client{
-		Timeout: 10 * time.Second,
-	}
-
-	resp, err := client.Get(url)
+	url := "http://localhost:" + strconv.Itoa(*port) + "/liveness"
+	res, err := http.Get(url)
 	if err != nil {
-		log.Printf("Health check failed: %v\n", err)
+		log.Printf("healthcheck error: %v", err)
 		return
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		log.Printf("Health check passed: %s returned status %d\n", url, resp.StatusCode)
-		return
-	} else {
-		log.Printf("Health check failed: %s returned status %d\n", url, resp.StatusCode)
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNoContent {
+		log.Printf("healthcheck not OK: %s", res.Status)
 		return
 	}
 }

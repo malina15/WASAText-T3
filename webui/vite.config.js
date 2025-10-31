@@ -1,16 +1,30 @@
-import { defineConfig } from 'vite'
+import {
+    fileURLToPath,
+    URL
+} from 'node:url'
+
+import {
+    defineConfig
+} from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-export default defineConfig({
-  plugins: [vue()],
-  server: {
-    host: '0.0.0.0',
-    proxy: { 
-      '/session': 'http://localhost:8080',
-      '/user': 'http://localhost:8080',
-      '/conversations': 'http://localhost:8080',
-      '/messages': 'http://localhost:8080',
-      '/groups': 'http://localhost:8080'
-    }
-  }
+// https://vitejs.dev/config/
+export default defineConfig(({
+    command,
+    mode,
+    ssrBuild
+}) => {
+    const ret = {
+        plugins: [vue()],
+        resolve: {
+            alias: {
+                '@': fileURLToPath(new URL('./src',
+                    import.meta.url))
+            }
+        },
+    };
+    ret.define = {
+        "__API_URL__": JSON.stringify("http://localhost:3000"),
+    };
+    return ret;
 })

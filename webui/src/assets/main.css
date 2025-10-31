@@ -1,0 +1,49 @@
+:root {
+    --pf-bg: #0f172a;          /* slate-900 */
+    --pf-surface: #111827;     /* gray-900 */
+    --pf-accent: #8b5cf6;      /* violet-500 */
+    --pf-accent-2: #22d3ee;    /* cyan-400 */
+    --pf-text: #e5e7eb;        /* gray-200 */
+    --pf-danger: #ef4444;      /* red-500 */
+}
+
+html {
+    height: 100%;
+}
+
+main {
+    height: 100vh;
+}
+
+body {
+    background: linear-gradient(135deg, var(--pf-bg), var(--pf-surface));
+    color: var(--pf-text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI,
+      Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji",
+      "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+/* Ensure readability on light surfaces */
+.card, .card * {
+  color: #111827;
+}
+
+.user {
+    background-color: rgba(255,255,255,0.04);
+    border-radius: 12px;
+}
+
+.my-trnsp-btn {
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--pf-text);
+    background: transparent;
+    border-radius: 8px;
+}
+
+.btn-primary-pf{
+    background: linear-gradient(135deg, var(--pf-accent), var(--pf-accent-2));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+}

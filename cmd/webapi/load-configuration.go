@@ -1,78 +1,71 @@
 package main
 
 import (
-	"io/ioutil"
-	"log"
+	"errors"
+	"fmt"
+	"io"
 	"os"
+	"time"
 
+	"github.com/ardanlabs/conf"
 	"gopkg.in/yaml.v2"
 )
 
-// Config represents the application configuration
-type Config struct {
-	Server struct {
-		Port string `yaml:"port"`
-		Host string `yaml:"host"`
-	} `yaml:"server"`
-	Database struct {
-		Path   string `yaml:"path"`
-		Driver string `yaml:"driver"`
-	} `yaml:"database"`
-	Logging struct {
-		Level  string `yaml:"level"`
-		Format string `yaml:"format"`
-	} `yaml:"logging"`
-}
-
-// DefaultConfig returns a default configuration
-func DefaultConfig() *Config {
-	return &Config{
-		Server: struct {
-			Port string `yaml:"port"`
-			Host string `yaml:"host"`
-		}{
-			Port: "8080",
-			Host: "localhost",
-		},
-		Database: struct {
-			Path   string `yaml:"path"`
-			Driver string `yaml:"driver"`
-		}{
-			Path:   "./data/chat.db", // Use relative path for local development
-			Driver: "sqlite3",
-		},
-		Logging: struct {
-			Level  string `yaml:"level"`
-			Format string `yaml:"format"`
-		}{
-			Level:  "info",
-			Format: "text",
-		},
+// WebAPIConfiguration describes the web API configuration. This structure is automatically parsed by
+// loadConfiguration and values from flags, environment variable or configuration file will be loaded.
+type WebAPIConfiguration struct {
+	Config struct {
+		Path string `conf:"default:/conf/config.yml"`
+	}
+	Web struct {
+		APIHost         string        `conf:"default:0.0.0.0:3000"`
+		DebugHost       string        `conf:"default:0.0.0.0:4000"`
+		ReadTimeout     time.Duration `conf:"default:5s"`
+		WriteTimeout    time.Duration `conf:"default:5s"`
+		ShutdownTimeout time.Duration `conf:"default:5s"`
+	}
+	Debug bool
+	DB    struct {
+		Filename string `conf:"default:/tmp/wasa.db"`
 	}
 }
 
-// LoadConfig loads configuration from file or returns default
-func LoadConfig() *Config {
-	// Try to load from demo/config.yaml first (for Docker)
-	configPath := "demo/config.yaml"
-	if _, err := os.Stat(configPath); err == nil {
-		data, err := ioutil.ReadFile(configPath)
-		if err == nil {
-			var config Config
-			if err := yaml.Unmarshal(data, &config); err == nil {
-				log.Printf("Loaded configuration from %s", configPath)
-				return &config
+// loadConfiguration creates a WebAPIConfiguration starting from flags, environment variables and configuration file.
+// It works by loading environment variables first, then update the config using command line flags, finally loading the
+// configuration file (specified in WebAPIConfiguration.Config.Path).
+// So, CLI parameters will override the environment, and configuration file will override everything.
+// Note that the configuration file can be specified only via CLI or environment variable.
+func loadConfiguration() (WebAPIConfiguration, error) {
+	var cfg WebAPIConfiguration
+
+	// Try to load configuration from environment variables and command line switches
+	if err := conf.Parse(os.Args[1:], "CFG", &cfg); err != nil {
+		if errors.Is(err, conf.ErrHelpWanted) {
+			usage, err := conf.Usage("CFG", &cfg)
+			if err != nil {
+				return cfg, fmt.Errorf("generating config usage: %w", err)
 			}
+			fmt.Println(usage) //nolint:forbidigo
+			return cfg, conf.ErrHelpWanted
 		}
+		return cfg, fmt.Errorf("parsing config: %w", err)
 	}
 
-	// Check if we're in Docker - if so, use 0.0.0.0, otherwise localhost
-	config := DefaultConfig()
-	if os.Getenv("DOCKER_ENV") == "true" || os.Getenv("CONTAINER") == "true" {
-		config.Server.Host = "0.0.0.0"
-		log.Printf("Using Docker configuration (0.0.0.0)")
-	} else {
-		log.Printf("Using default configuration for local development")
+	// Override values from YAML if specified and if it exists (useful in k8s/compose)
+	fp, err := os.Open(cfg.Config.Path)
+	if err != nil && !os.IsNotExist(err) {
+		return cfg, fmt.Errorf("can't read the config file, while it exists: %w", err)
+	} else if err == nil {
+		yamlFile, err := io.ReadAll(fp)
+		if err != nil {
+			return cfg, fmt.Errorf("can't read config file: %w", err)
+		}
+		err = yaml.Unmarshal(yamlFile, &cfg)
+		if err != nil {
+			return cfg, fmt.Errorf("can't unmarshal config file: %w", err)
+		}
+		_ = fp.Close()
 	}
-	return config
+
+	return cfg, nil
 }

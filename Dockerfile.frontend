@@ -1,12 +1,17 @@
-# syntax=docker/dockerfile:1
-FROM node:20-alpine AS build
-WORKDIR /app
-COPY webui/package*.json webui/
-RUN cd webui && npm ci
-COPY webui webui
-RUN cd webui && npm run build
+# Build using -> 
+# docker build -t wasaphoto-frontend:latest -f Dockerfile.frontend .
+#
+# Execute the Dockerfile.frontend using ->
+# docker run -it -p 8080:80 --rm wasaphoto-frontend:latest
 
-FROM nginx:1.27-alpine
-COPY --from=build /app/webui/dist /usr/share/nginx/html
-COPY webui/nginx.conf /etc/nginx/conf.d/default.conf
+FROM node:lts as frontend_compiler
+WORKDIR /src/webui
+# Install deps fresh for Linux inside container to avoid host node_modules
+COPY webui/package*.json ./
+RUN npm ci
+COPY webui .
+RUN npm run build-prod
+
+FROM nginx:latest
+COPY --from=frontend_compiler /src/webui/dist /usr/share/nginx/html
 EXPOSE 80

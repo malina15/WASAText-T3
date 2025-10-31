@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile.backend
     ports:
-      - "8080:8080"
+      - "3000:3000"
     environment:
       - GIN_MODE=release
     volumes:
@@ -22,7 +22,7 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./webui/nginx.compose.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./webui/conf.d:/etc/nginx/conf.d:ro
     networks:
       - wasa_network
 

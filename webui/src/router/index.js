@@ -1,51 +1,48 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import Login from '../views/Login.vue'
-import Conversations from '../views/Conversations.vue'
-import ConversationDetail from '../views/ConversationDetail.vue'
-import Profile from '../views/Profile.vue'
-
-const routes = [
-  {
-    path: '/',
-    name: 'Login',
-    component: Login
-  },
-  {
-    path: '/conversations',
-    name: 'Conversations',
-    component: Conversations,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/conversations/:id',
-    name: 'ConversationDetail',
-    component: ConversationDetail,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/profile',
-    name: 'Profile',
-    component: Profile,
-    meta: { requiresAuth: true }
-  }
-]
+import {
+    createRouter,
+    createWebHashHistory
+} from 'vue-router'
+import HomeView from '../views/HomeView.vue'
+import LoginView from '../views/LoginView.vue'
+import SearchView from '../views/SearchView.vue'
+import ProfileView from '../views/ProfileView.vue'
+import PageNotFoundView from '../views/PageNotFoundView.vue'
+import SettingsView from '../views/SettingsView.vue'
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes
-})
+    history: createWebHashHistory(
+        import.meta.env.BASE_URL),
+    routes: [{
+            path: '/',
+            redirect: '/login'
+        },
+        {
+            path: '/login',
+            component: LoginView
+        },
+        {
+            path: '/home',
+            component: HomeView
+        },
+        {
+            path: '/search',
+            component: SearchView
+        },
+        {
+            path: '/users/:id',
+            component: ProfileView
 
-// Navigation guard to check authentication
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
-  
-  if (to.meta.requiresAuth && !token) {
-    next('/')
-  } else if (to.path === '/' && token) {
-    next('/conversations')
-  } else {
-    next()
-  }
+        },
+        {
+            path: '/users/:id/settings',
+            component: SettingsView
+
+        },
+        {
+            path: "/:catchAll(.*)",
+            component: PageNotFoundView
+        },
+    ]
 })
 
 export default router
