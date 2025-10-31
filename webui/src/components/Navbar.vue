@@ -21,6 +21,7 @@ export default {
     myProfile(){
       this.$emit('requestUpdateView',"/users/"+localStorage.getItem('token'))
     },
+    openChats(){ this.$router.replace('/chats') },
     profileIconInactive(){
       this.iconProfile = "fa-regular"
     },
@@ -49,6 +50,9 @@ export default {
       </div>
 
       <div class="col-4 d-flex justify-content-end">
+          <button @click="openChats" class="my-trnsp-btn me-2" type="button">
+              <i class="fa-regular fa-message"></i>
+          </button>
           <button @click="myProfile" class="my-trnsp-btn me-2" type="button">
               <!--Profile-->
               <i :class="'my-nav-icon-profile me-1 w-100 h-100 '+iconProfile+ ' fa-user'" @mouseover="profileIconActive" @mouseout="profileIconInactive"></i>

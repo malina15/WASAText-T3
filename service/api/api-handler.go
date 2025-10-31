@@ -28,6 +28,11 @@ func (rt *_router) Handler() http.Handler {
 	// Stream endpoint
 	rt.router.GET("/users/:id/home", rt.wrap(rt.getHome))
 
+	// Chat endpoints
+	rt.router.GET("/users/:id/chats", rt.wrap(rt.listChats))
+	rt.router.GET("/users/:id/chats/:peer/messages", rt.wrap(rt.listMessages))
+	rt.router.POST("/users/:id/chats/:peer/messages", rt.wrap(rt.sendMessage))
+
 	// Photo Endpoint
 	rt.router.POST("/users/:id/photos", rt.wrap(rt.postPhoto))
 	rt.router.DELETE("/users/:id/photos/:photo_id", rt.wrap(rt.deletePhoto))

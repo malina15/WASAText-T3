@@ -122,6 +122,10 @@ type AppDatabase interface {
 
 	// Ping checks whether the database is available or not (in that case, an error will be returned)
 	Ping() error
+
+    // Chat methods
+    CreateMessage(from User, to User, body string) (int64, error)
+    ListMessages(a User, b User, limit int, offset int) ([]Message, error)
 }
 
 type appdbimpl struct {
@@ -163,7 +167,7 @@ func (db *appdbimpl) Ping() error {
 
 // Creates all the necessary sql tables for the WASAPhoto app.
 func createDatabase(db *sql.DB) error {
-	tables := [6]string{
+    tables := [7]string{
 		`CREATE TABLE IF NOT EXISTS users (
 			id_user VARCHAR(16) NOT NULL PRIMARY KEY,
 			nickname VARCHAR(16) NOT NULL
@@ -195,13 +199,22 @@ func createDatabase(db *sql.DB) error {
 			FOREIGN KEY(banner) REFERENCES users (id_user) ON DELETE CASCADE,
 			FOREIGN KEY(banned) REFERENCES users (id_user) ON DELETE CASCADE
 			);`,
-		`CREATE TABLE IF NOT EXISTS followers(
+        `CREATE TABLE IF NOT EXISTS followers(
 			follower VARCHAR(16) NOT NULL,
 			followed VARCHAR(16) NOT NULL,
 			PRIMARY KEY (follower,followed),
 			FOREIGN KEY(follower) REFERENCES users (id_user) ON DELETE CASCADE,
 			FOREIGN KEY(followed) REFERENCES users (id_user) ON DELETE CASCADE
 			);`,
+        `CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sender VARCHAR(16) NOT NULL,
+            receiver VARCHAR(16) NOT NULL,
+            body TEXT NOT NULL,
+            date DATETIME NOT NULL,
+            FOREIGN KEY(sender) REFERENCES users (id_user) ON DELETE CASCADE,
+            FOREIGN KEY(receiver) REFERENCES users (id_user) ON DELETE CASCADE
+            );`,
 	}
 
 	// Iteration to create all the needed sql schemas

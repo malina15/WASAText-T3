@@ -61,3 +61,12 @@ type CompleteComment struct {
 	Nickname  string `json:"nickname"`   // Nickname of a user
 	Comment   string `json:"comment"`    // Comment content
 }
+
+// Message structure for the database (direct chat message)
+type Message struct {
+    Id       int64     `json:"id"`
+    Sender   string    `json:"sender"`
+    Receiver string    `json:"receiver"`
+    Body     string    `json:"body"`
+    Date     time.Time `json:"date"`
+}
