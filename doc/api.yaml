@@ -5,9 +5,17 @@ info:
     This is the API for the WASAphoto Homework 1 for the WaSa course by 1849661.
   version: 0.0.1
 
+servers:
+  - url: http://localhost:3000/v1
+    description: Local development server
+
 tags:
   - name: "login"
     description: Endpoint that manages the login
+  - name: "chat"
+    description: Endpoint that manages chats/messages
+  - name: "group"
+    description: Endpoint that manages groups
   - name: "search"
     description: Endpoint that manages search
   - name: "user"
@@ -40,7 +48,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/user_login"
+              $ref: "#/components/schemas/UserLogin"
 
         required: true
       responses:
@@ -49,7 +57,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/login_return"
+                $ref: "#/components/schemas/LoginReturn"
+              example:
+                identifier: "abcdef0123456789"
 #=====================================================================================
   /users:
     get:
@@ -111,14 +121,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/user_nickname"
+              $ref: "#/components/schemas/CompleteProfilePrototype"
             example: 
               nickname: "NickBruhhh"
         required: true
 
       responses:
-        '204':
-          $ref: "#/components/responses/no_content"
+        '200':
+          $ref: "#/components/responses/profile"
         '401':
           $ref: "#/components/responses/unauthorized"
         '403':
@@ -130,6 +140,73 @@ paths:
           
       security:
         - bearerAuth: [] 
+#=====================================================================================
+  /users/{id}/photo:
+    parameters:
+        - $ref: '#/components/parameters/identifier'
+
+    put:
+      tags: ["user"]
+      summary: Set my profile photo
+      description: Uploads/updates the profile photo of the user
+      operationId: setMyPhoto
+
+      requestBody:
+        content:
+          image/*:
+            schema:
+              description: Raw image bytes (PNG/JPEG/GIF)
+              type: string
+              format: binary
+              minLength: 1
+              maxLength: 10485760
+        required: true
+
+      responses:
+        '201':
+          $ref: "#/components/responses/ok"
+        '400':
+          $ref: "#/components/responses/bad_request"
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+
+    get:
+      tags: ["user"]
+      summary: Get user profile photo
+      description: Downloads the profile photo (requester must be logged in and not banned by target user)
+      operationId: getMyPhoto
+
+      responses:
+        '200':
+          description: User profile photo
+          content:
+            image/*:
+              schema:
+                description: Raw image bytes (PNG/JPEG/GIF)
+                type: string
+                format: binary
+                minLength: 1
+                maxLength: 10485760
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
 #=====================================================================================
   /users/{id}/banned_users/{banned_user_id}:
     parameters:
@@ -143,8 +220,8 @@ paths:
       operationId: banUser
       
       responses:
-        '204':
-          $ref: "#/components/responses/no_content"
+        '200':
+          $ref: "#/components/responses/ok"
         '401':
           $ref: "#/components/responses/unauthorized"
         '403':
@@ -164,8 +241,8 @@ paths:
       operationId: unbanUser
       
       responses:
-        '204':
-          $ref: "#/components/responses/no_content"
+        '200':
+          $ref: "#/components/responses/ok"
         '401':
           $ref: "#/components/responses/unauthorized"
         '403':
@@ -191,8 +268,8 @@ paths:
       operationId: followUser
       
       responses:
-        '204':
-          $ref: "#/components/responses/no_content"
+        '200':
+          $ref: "#/components/responses/ok"
         '401':
           $ref: "#/components/responses/unauthorized"
         '403':
@@ -252,6 +329,409 @@ paths:
       security:
         - bearerAuth: [] 
 #=====================================================================================
+  /users/{id}/chats:
+    parameters:
+        - $ref: '#/components/parameters/identifier'
+
+    get:
+      tags: ["chat"]
+      summary: Get my conversations
+      description: Returns the list of chat peers (conversations)
+      operationId: getMyConversations
+
+      responses:
+        '200':
+          description: List of conversations (peers)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationsList"
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+#=====================================================================================
+  /users/{id}/chats/{peer}/messages:
+    parameters:
+        - $ref: '#/components/parameters/identifier'
+        - $ref: '#/components/parameters/peer'
+
+    get:
+      tags: ["chat"]
+      summary: Get a conversation
+      description: Returns the list of messages exchanged with a peer
+      operationId: getConversation
+
+      responses:
+        '200':
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessagesList"
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+
+    post:
+      tags: ["chat"]
+      summary: Send a message
+      description: Sends a message to a peer
+      operationId: sendMessage
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessage"
+        required: true
+
+      responses:
+        '201':
+          $ref: "#/components/responses/ok"
+        '400':
+          $ref: "#/components/responses/bad_request"
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+#=====================================================================================
+  /users/{id}/chats/{peer}/messages/{message_id}:
+    parameters:
+        - $ref: '#/components/parameters/identifier'
+        - $ref: '#/components/parameters/peer'
+        - $ref: '#/components/parameters/message_id'
+
+    delete:
+      tags: ["chat"]
+      summary: Delete a message
+      description: Deletes a message sent by the user (works for direct and group conversations)
+      operationId: deleteMessage
+
+      responses:
+        '200':
+          $ref: "#/components/responses/ok"
+        '400':
+          $ref: "#/components/responses/bad_request"
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+#=====================================================================================
+  /users/{id}/chats/{peer}/messages/{message_id}/comments:
+    parameters:
+        - $ref: '#/components/parameters/identifier'
+        - $ref: '#/components/parameters/peer'
+        - $ref: '#/components/parameters/message_id'
+
+    post:
+      tags: ["chat"]
+      summary: React to a message
+      description: Adds or replaces the current user's reaction (emoticon) to a message
+      operationId: commentMessage
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageReaction"
+        required: true
+
+      responses:
+        '200':
+          $ref: "#/components/responses/ok"
+        '400':
+          $ref: "#/components/responses/bad_request"
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+
+    delete:
+      tags: ["chat"]
+      summary: Remove reaction from a message
+      description: Removes the current user's reaction from a message
+      operationId: uncommentMessage
+
+      responses:
+        '204':
+          $ref: "#/components/responses/no_content"
+        '400':
+          $ref: "#/components/responses/bad_request"
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+#=====================================================================================
+  /users/{id}/chats/{peer}/messages/{message_id}/forward:
+    parameters:
+        - $ref: '#/components/parameters/identifier'
+        - $ref: '#/components/parameters/peer'
+        - $ref: '#/components/parameters/message_id'
+
+    post:
+      tags: ["chat"]
+      summary: Forward a message
+      description: Forwards a message to another conversation (direct user id or group peer id like g-42)
+      operationId: forwardMessage
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForwardMessage"
+        required: true
+
+      responses:
+        '204':
+          $ref: "#/components/responses/no_content"
+        '400':
+          $ref: "#/components/responses/bad_request"
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+#=====================================================================================
+  /users/{id}/groups:
+    parameters:
+        - $ref: '#/components/parameters/identifier'
+
+    post:
+      tags: ["group"]
+      summary: Create a group
+      description: Creates a new group conversation with the specified members
+      operationId: createGroup
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGroup"
+        required: true
+
+      responses:
+        '201':
+          description: Group created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupCreated"
+        '400':
+          $ref: "#/components/responses/bad_request"
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+#=====================================================================================
+  /groups/{group_id}:
+    parameters:
+        - $ref: '#/components/parameters/group_id'
+
+    put:
+      tags: ["group"]
+      summary: Set group name
+      description: Updates the group name
+      operationId: setGroupName
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupName"
+        required: true
+
+      responses:
+        '200':
+          $ref: "#/components/responses/ok"
+        '400':
+          $ref: "#/components/responses/bad_request"
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+#=====================================================================================
+  /groups/{group_id}/members/{member_id}:
+    parameters:
+        - $ref: '#/components/parameters/group_id'
+        - $ref: '#/components/parameters/member_id'
+
+    put:
+      tags: ["group"]
+      summary: Add user to group
+      description: Adds an existing user to the group
+      operationId: addToGroup
+
+      responses:
+        '200':
+          $ref: "#/components/responses/ok"
+        '400':
+          $ref: "#/components/responses/bad_request"
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+
+    delete:
+      tags: ["group"]
+      summary: Leave group
+      description: Removes the requesting user from the group
+      operationId: leaveGroup
+
+      responses:
+        '204':
+          $ref: "#/components/responses/no_content"
+        '400':
+          $ref: "#/components/responses/bad_request"
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+#=====================================================================================
+  /groups/{group_id}/photo:
+    parameters:
+        - $ref: '#/components/parameters/group_id'
+
+    put:
+      tags: ["group"]
+      summary: Set group photo
+      description: Uploads/updates the group photo
+      operationId: setGroupPhoto
+
+      requestBody:
+        content:
+          image/*:
+            schema:
+              description: Raw image bytes (PNG/JPEG/GIF)
+              type: string
+              format: binary
+              minLength: 1
+              maxLength: 10485760
+        required: true
+
+      responses:
+        '200':
+          $ref: "#/components/responses/ok"
+        '400':
+          $ref: "#/components/responses/bad_request"
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+
+    get:
+      tags: ["group"]
+      summary: Get group photo
+      description: Downloads the group photo (members only)
+      operationId: getGroupPhoto
+
+      responses:
+        '200':
+          description: Group photo
+          content:
+            image/*:
+              schema:
+                description: Raw image bytes (PNG/JPEG/GIF)
+                type: string
+                format: binary
+                minLength: 1
+                maxLength: 10485760
+        '401':
+          $ref: "#/components/responses/unauthorized"
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: "#/components/responses/not_found"
+        '500':
+          $ref: "#/components/responses/internal_server_error"
+
+      security:
+        - bearerAuth: []
+#=====================================================================================
   /users/{id}/photos:
     parameters: 
         - $ref: '#/components/parameters/identifier'
@@ -266,7 +746,7 @@ paths:
         content:
           image/*:
             schema:
-              $ref: "#/components/schemas/raw_photo"
+              $ref: "#/components/schemas/RawPhoto"
             example:
               photo_data: "010110010"
         required: true
@@ -348,7 +828,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/comment'
+              $ref: '#/components/schemas/Comment'
         required: true
       
       responses:
@@ -379,8 +859,8 @@ paths:
       operationId: uncommentPhoto
       
       responses:
-        '204':
-          $ref: '#/components/responses/no_content'
+        '200':
+          $ref: '#/components/responses/ok'
         '401':
           $ref: '#/components/responses/unauthorized'
         '403':
@@ -406,8 +886,8 @@ paths:
       operationId: likePhoto
       
       responses:
-        '204':
-          $ref: '#/components/responses/no_content'
+        '200':
+          $ref: '#/components/responses/ok'
         '401':
           $ref: '#/components/responses/unauthorized'
         '403':
@@ -459,6 +939,54 @@ components:
         minLength: 3
         maxLength: 16
         readOnly: true
+#........................................................
+    group_id:
+      name: group_id
+      in: path
+      description: Group unique identifier
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+        example: 42
+#........................................................
+    member_id:
+      name: member_id
+      in: path
+      description: Group member user identifier
+      required: true
+      schema:
+        description: String between 3-16 characters
+        type: string
+        pattern: '^.*?$'
+        minLength: 3
+        maxLength: 16
+        example: "abcdef012345"
+#........................................................
+    message_id:
+      name: message_id
+      in: path
+      description: Message unique identifier
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+        example: 123
+#........................................................
+    peer:
+      name: peer
+      in: path
+      description: A chat peer unique identifier
+      required: true
+      schema:
+        description: String between 3-16 characters
+        type: string
+        pattern: '^.*?$'
+        minLength: 3
+        maxLength: 16
+        example: "abcdef012345"
 #........................................................        
     photo_id:
       name: photo_id
@@ -480,7 +1008,7 @@ components:
       description: A comment unique identifier
       required: true
       schema:
-        $ref: "#/components/schemas/comment_identifier/properties/comment_id"
+        $ref: "#/components/schemas/CommentIdentifier/properties/commentId"
       example: 118
 #........................................................        
     follower_id:
@@ -489,7 +1017,7 @@ components:
       description: A follower's unique identifier. It's exactly his *identifier*
       required: true
       schema: 
-        $ref: "#/components/schemas/user_nickname/properties/nickname"
+        $ref: "#/components/schemas/CompleteProfilePrototype/properties/nickname"
       example: "Piccioni"
 #........................................................       
     like_id:
@@ -498,7 +1026,7 @@ components:
       description: A like unique identifier. It's exactly the *identifier* of the user that liked the photo
       required: true
       schema: 
-        $ref: "#/components/schemas/user_nickname/properties/nickname"
+        $ref: "#/components/schemas/CompleteProfilePrototype/properties/nickname"
       example: "LauraZ"
 #........................................................       
     banned_user_id:
@@ -507,7 +1035,7 @@ components:
       description: A banned user unique identifier. It's exactly the *identifier* of the user
       required: true
       schema:
-        $ref: "#/components/schemas/user_nickname/properties/nickname"
+        $ref: "#/components/schemas/CompleteProfilePrototype/properties/nickname"
       example: "Akille"
 #........................................................      
     query_id:
@@ -526,7 +1054,7 @@ components:
 #_____________________________________________________________________________________________________
   schemas:
 
-    user_nickname:
+    CompleteProfilePrototype:
       description: It's a user's nickname
       type: object
       properties:
@@ -540,23 +1068,23 @@ components:
       example:
         nickname: "PolpoFizione"
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||   
-    complete_user:
+    CompleteProfileSummary:
       description: Contains both *unique identifier and nickname of a user
       type: object
       properties:
-        user_id:
-          $ref: "#/components/schemas/user_nickname/properties/nickname"
+        userId:
+          $ref: "#/components/schemas/CompleteProfilePrototype/properties/nickname"
         nickname:
-          $ref: "#/components/schemas/user_nickname/properties/nickname"
+          $ref: "#/components/schemas/CompleteProfilePrototype/properties/nickname"
       example:
-        user_id: "Bro9999"
+        userId: "Bro9999"
         nickname: "YourBro"
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||   
-    comment_identifier:
+    CommentIdentifier:
       description: It's a comment *unique* id
       type: object
       properties:
-        comment_id:
+        commentId:
           description: Any number between 0-9999
           type: integer
           format: int64
@@ -565,16 +1093,16 @@ components:
           readOnly: true
           example: 965
       example:
-        comment_id: 965
+        commentId: 965
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||        
-    comment:
+    Comment:
       description: A user's comment contains the text of the comment and the *identifier* of who commented
       type: object
       properties:
-        user_id: 
-          $ref: "#/components/schemas/user_nickname/properties/nickname"
+        userId: 
+          $ref: "#/components/schemas/CompleteProfilePrototype/properties/nickname"
         nickname: 
-          $ref: "#/components/schemas/user_nickname/properties/nickname"
+          $ref: "#/components/schemas/CompleteProfilePrototype/properties/nickname"
         comment:
           type: string
           minLength: 1
@@ -582,20 +1110,20 @@ components:
           pattern: '^.*?$'
           example: OK my bruh
           description: String value of the comment
-        comment_id:
-          $ref: "#/components/schemas/comment_identifier/properties/comment_id"
+        commentId:
+          $ref: "#/components/schemas/CommentIdentifier/properties/commentId"
       example:
-        user_id: "PannaBoy22"
+        userId: "PannaBoy22"
         nickname: "22creammm"
         photo_id: 873
         comment: "Wow che foto spectacularesss"    
-        comment_id: 16
+        commentId: 16
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    raw_photo:
+    RawPhoto:
       description: Image content
       type: object
       properties:
-        photo_data:
+        photoData:
           description: "Raw data of the photo"
           type: string
           minLength: 0
@@ -603,9 +1131,9 @@ components:
           format: binary
           example: "010110010"
       example: 
-        photo_data: "010110010"
+        photoData: "010110010"
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    photo:
+    Photo:
       description: Contains the essential info of a photo
       type: object
       properties:
@@ -615,7 +1143,7 @@ components:
           minItems: 0
           maxItems: 9999
           items:
-            $ref: "#/components/schemas/comment"
+            $ref: "#/components/schemas/Comment"
           example:
             - comments:
               - user_id: "miky"
@@ -629,7 +1157,7 @@ components:
           minItems: 0
           maxItems: 9999
           items:
-            $ref: "#/components/schemas/complete_user"
+            $ref: "#/components/schemas/CompleteProfileSummary"
           example: 
             -  user_id: "Bro9999"
                nickname: "YourBro"
@@ -641,10 +1169,10 @@ components:
           format: date-time
           example: 2017-07-21T17:32:28Z
           readOnly: true
-        photo_id:
-          $ref: "#/components/schemas/comment_identifier/properties/comment_id"
+        photoId:
+          $ref: "#/components/schemas/CommentIdentifier/properties/commentId"
         owner:
-          $ref: "#/components/schemas/user_nickname/properties/nickname"
+          $ref: "#/components/schemas/CompleteProfilePrototype/properties/nickname"
       example: 
         comments:
           - user_id: "miky"
@@ -656,20 +1184,20 @@ components:
           - user_id: "miky"
             nickname: "ErMike"
         date: 2017-07-21T17:32:28Z
-        photo_id: 3821
+        photoId: 3821
         owner: "Mariucc"
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||      
-    photos:
+    Photos:
       description: Represents a list of photos
       type: object
       properties:
-        photos_list:
+        photosList:
           description: List of photos
           type: array
           minItems: 0
           maxItems: 10
           items:
-            $ref: "#/components/schemas/photo"
+            $ref: "#/components/schemas/Photo"
           example:
             - comments:
                 - user_id: "donatello"
@@ -713,7 +1241,7 @@ components:
               photo_id: 7836
               owner: "Nerd99"
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||      
-    users_list:
+    CompleteProfileCollection:
       description: List of users found
       type: object
       properties:
@@ -723,7 +1251,7 @@ components:
           minItems: 0
           maxItems: 10
           items:
-            $ref: "#/components/schemas/complete_user"
+            $ref: "#/components/schemas/CompleteProfileSummary"
           example:
             - user_id: Wario21
               nickname: marietto21
@@ -734,16 +1262,16 @@ components:
             - user_id: WantedMan66
               nickname: uomoRicercato
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||  
-    complete_profile:
+    CompleteProfile:
           description: Object containing all the profile info
           type: object
           properties:
           
-            user_id:
-              $ref: "#/components/schemas/user_nickname/properties/nickname"
+            userId:
+              $ref: "#/components/schemas/CompleteProfilePrototype/properties/nickname"
               
             nickname:
-              $ref: "#/components/schemas/user_nickname/properties/nickname"
+              $ref: "#/components/schemas/CompleteProfilePrototype/properties/nickname"
               
             followers:
               description: Array of followers
@@ -751,7 +1279,7 @@ components:
               minItems: 0
               maxItems: 99
               items:
-                $ref: "#/components/schemas/complete_user"
+                $ref: "#/components/schemas/CompleteProfileSummary"
               example:
                 - user_id: "Wario21"
                   nickname: "warietto21"
@@ -764,7 +1292,7 @@ components:
               minItems: 0
               maxItems: 99
               items:
-                $ref: "#/components/schemas/complete_user"
+                $ref: "#/components/schemas/CompleteProfileSummary"
               example:
                 - user_id: "giulio"
                   nickname: "Milioo"
@@ -775,7 +1303,7 @@ components:
               minItems: 0
               maxItems: 10
               items:
-                $ref: "#/components/schemas/photo"
+                $ref: "#/components/schemas/Photo"
               example:
                 - comments:
                   - user_id: "sfera"
@@ -798,86 +1326,483 @@ components:
                   photo_id: 7836
                   owner: "PulpFiction"
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||            
-    user_login:
-      description: Identifier sent by user during the login
+    ConversationsList:
+      description: List of conversations (chat peers)
       type: object
       properties:
-        identifier:
-          $ref: "#/components/schemas/user_nickname/properties/nickname"
+        conversations:
+          description: Array of conversations (direct peers and groups)
+          type: array
+          minItems: 0
+          maxItems: 9999
+          items:
+            $ref: "#/components/schemas/Conversation"
+      required:
+        - conversations
+      example:
+        conversations:
+          - peer: "abcdef012345"
+            isGroup: false
+            name: "Maria"
+            photoUrl: "/users/abcdef012345/photo"
+            lastMessageAt: 2017-07-21T17:32:28Z
+            lastMessagePreview: "Hello!"
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    Conversation:
+      description: Conversation summary (direct chat or group chat)
+      type: object
+      properties:
+        peer:
+          description: Conversation peer identifier (user id or group peer id like g-42)
+          type: string
+          pattern: '^.*?$'
+          minLength: 1
+          maxLength: 32
+          example: "g-42"
+        isGroup:
+          description: True if this is a group conversation
+          type: boolean
+          example: true
+        name:
+          description: Other user's name or group name
+          type: string
+          pattern: '^.*?$'
+          minLength: 0
+          maxLength: 64
+          example: "My group"
+        photoUrl:
+          description: URL for conversation photo (user/group)
+          type: string
+          pattern: '^.*?$'
+          minLength: 0
+          maxLength: 256
+          example: "/groups/42/photo"
+        lastMessageAt:
+          description: Timestamp of last message in this conversation
+          type: string
+          format: date-time
+          example: 2017-07-21T17:32:28Z
+        lastMessagePreview:
+          description: Snippet of last message (or empty)
+          type: string
+          pattern: '^.*?$'
+          minLength: 0
+          maxLength: 256
+          example: "Hello!"
+      required:
+        - peer
+        - isGroup
+        - name
+        - photoUrl
+        - lastMessageAt
+        - lastMessagePreview
+      example:
+        peer: "g-42"
+        isGroup: true
+        name: "My group"
+        photoUrl: "/groups/42/photo"
+        lastMessageAt: 2017-07-21T17:32:28Z
+        lastMessagePreview: "Hello!"
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    MessagesList:
+      description: List of messages in a conversation
+      type: object
+      properties:
+        messages:
+          description: Array of messages
+          type: array
+          minItems: 0
+          maxItems: 9999
+          items:
+            $ref: "#/components/schemas/Message"
+      required:
+        - messages
+      example:
+        messages:
+          - id: 123
+            sender: "abcdef012345"
+            receiver: "fedcba543210"
+            body: "Hello!"
+            date: 2017-07-21T17:32:28Z
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    CreateGroup:
+      description: Create group request body
+      type: object
+      properties:
+        name:
+          description: Group name
+          type: string
+          minLength: 1
+          maxLength: 32
+          pattern: '^.*?$'
+          example: "My group"
+        members:
+          description: Array of user identifiers to be added to the group
+          type: array
+          minItems: 0
+          maxItems: 9999
+          items:
+            type: string
+            pattern: '^.*?$'
+            minLength: 3
+            maxLength: 16
+            example: "abcdef012345"
+      required:
+        - name
+      example:
+        name: "My group"
+        members:
+          - "abcdef012345"
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    GroupCreated:
+      description: Group creation response
+      type: object
+      properties:
+        groupId:
+          description: Group unique identifier
+          type: integer
+          format: int64
+          example: 42
+          readOnly: true
+      required:
+        - groupId
+      example:
+        groupId: 42
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    GroupName:
+      description: Group name update request body
+      type: object
+      properties:
+        name:
+          description: Group name
+          type: string
+          minLength: 1
+          maxLength: 32
+          pattern: '^.*?$'
+          example: "New group name"
+      required:
+        - name
+      example:
+        name: "New group name"
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    MessageReaction:
+      description: Reaction (emoticon) body
+      type: object
+      properties:
+        reaction:
+          description: Reaction emoticon/text
+          type: string
+          minLength: 1
+          maxLength: 16
+          pattern: '^.*?$'
+          example: "😀"
+      required:
+        - reaction
+      example:
+        reaction: "😀"
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    MessageReactionItem:
+      description: A reaction associated to a message
+      type: object
+      properties:
+        userId:
+          description: User identifier that reacted
+          type: string
+          pattern: '^.*?$'
+          minLength: 3
+          maxLength: 16
+          example: "abcdef012345"
+        reaction:
+          description: Reaction emoticon/text
+          type: string
+          minLength: 1
+          maxLength: 16
+          pattern: '^.*?$'
+          example: "😀"
+      required:
+        - userId
+        - reaction
+      example:
+        userId: "abcdef012345"
+        reaction: "😀"
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    ForwardMessage:
+      description: Forward message request body
+      type: object
+      properties:
+        to:
+          description: Target conversation peer identifier (user id or group peer id like g-42)
+          type: string
+          minLength: 1
+          maxLength: 32
+          pattern: '^.*?$'
+          example: "g-42"
+      required:
+        - to
+      example:
+        to: "g-42"
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    SendMessage:
+      description: Request body to send a message
+      type: object
+      properties:
+        body:
+          description: Text content of the message
+          type: string
+          minLength: 1
+          maxLength: 1000
+          pattern: '^.*?$'
+          example: "Hello!"
+      required:
+        - body
+      example:
+        body: "Hello!"
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    Message:
+      description: A direct chat message
+      type: object
+      properties:
+        id:
+          description: Message unique identifier
+          type: integer
+          format: int64
+          example: 123
+          readOnly: true
+        sender:
+          description: Sender user identifier
+          type: string
+          pattern: '^.*?$'
+          minLength: 3
+          maxLength: 16
+          example: "abcdef012345"
+        receiver:
+          description: Receiver user identifier
+          type: string
+          pattern: '^.*?$'
+          minLength: 3
+          maxLength: 16
+          example: "fedcba543210"
+        body:
+          description: Message body
+          type: string
+          minLength: 1
+          maxLength: 1000
+          pattern: '^.*?$'
+          example: "Hello!"
+        date:
+          description: Message timestamp
+          type: string
+          format: date-time
+          example: 2017-07-21T17:32:28Z
+          readOnly: true
+        status:
+          description: Checkmarks status for sent messages (0 none, 1 received, 2 read)
+          type: integer
+          minimum: 0
+          maximum: 2
+          example: 2
+          readOnly: true
+        reactions:
+          description: Reactions on this message
+          type: array
+          minItems: 0
+          maxItems: 9999
+          items:
+            $ref: "#/components/schemas/MessageReactionItem"
+      required:
+        - id
+        - sender
+        - receiver
+        - body
+        - date
+      example:
+        id: 123
+        sender: "abcdef012345"
+        receiver: "fedcba543210"
+        body: "Hello!"
+        date: 2017-07-21T17:32:28Z
+        status: 2
+        reactions:
+          - userId: "fedcba543210"
+            reaction: "😀"
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    UserLogin:
+      description: Username sent by user during the login
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/CompleteProfilePrototype/properties/nickname"
+      required:
+        - name
+      example:
+        name: Maria
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||          
-    login_return:
+    LoginReturn:
       description: Identifier returned after the login
       type: object
       properties:
         identifier:
-          $ref: "#/components/schemas/user_nickname/properties/nickname"
+          description: Identifier to be used as Bearer token in Authorization header
+          type: string
+          example: "abcdef012345"
+          pattern: '^.*?$'
+          minLength: 3
+          maxLength: 16
+      required:
+        - identifier
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    OkResponse:
+      description: Generic success payload for operations that don't return a resource representation
+      type: object
+      properties:
+        message:
+          description: Human-readable status message
+          type: string
+          pattern: '^.*?$'
+          example: "ok"
+      required:
+        - message
+      example:
+        message: "ok"
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    ErrorMessage:
+      description: Standard error payload
+      type: object
+      properties:
+        message:
+          description: Error message
+          type: string
+          pattern: '^.*?$'
+          example: "error"
+      required:
+        - message
+      example:
+        message: "error"
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #_____________________________________________________________________________________________________  
   responses:
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    ok:
+      description: Response associated to a 200 http status (OK)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OkResponse"
+          example:
+            message: "ok"
+#''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     no_content:
       description: Response associated to the 204 http status (No content to send for this reques)
+#''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    bad_request:
+      description: Response associated to the 400 http status (Bad request)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+          example:
+            message: "bad request"
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''     
     partial_content:
       description: Response associated to the 206 http status (The requested resource has partial info)
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/complete_profile" 
+            $ref: "#/components/schemas/CompleteProfile" 
+          example:
+            user_id: "abcdef0123456789"
+            nickname: "Maria"
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''      
     unauthorized:
       description:  Response associated to the 401 http status (Access token is missing. User is not logged in)
+# added content to satisfy OpenAPI lint ruleset
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+          example:
+            message: "unauthorized"
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''          
     forbidden:
       description: Response associated to the 403 http status (Access denied )
+# added content to satisfy OpenAPI lint ruleset
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+          example:
+            message: "forbidden"
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''     
     not_found:
       description: Response associated to the 404 http status (The requested resource doesn't exist)
+# added content to satisfy OpenAPI lint ruleset
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+          example:
+            message: "not found"
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''            
     internal_server_error:
       description: Response associated to the 500 http status (Server has encountered an unknown error)
+# added content to satisfy OpenAPI lint ruleset
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+          example:
+            message: "internal server error"
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     user_found:
       description: There's a match for the given identifier/nickname. User/users found successfully
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/users_list"
+            $ref: "#/components/schemas/CompleteProfileCollection"
+          example:
+            users:
+              - user_id: "Wario21"
+                nickname: "marietto21"
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''          
     stream:
       description: Contains a list of photos from following users in a reversed chronological order
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/photos"
+            $ref: "#/components/schemas/Photos"
+          example:
+            photos_list: []
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''            
     comment_added:
       description: Comment has been added successfully. Returns the comment *unique* identifier
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/comment_identifier"
+            $ref: "#/components/schemas/CommentIdentifier"
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''            
     photo_uploaded:
       description: photo has been uploaded successfully. Returns the *unique* id of the posted photo
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/photo"
+            $ref: "#/components/schemas/RawPhoto"
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     profile:
       description: All the info of a profile
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/complete_profile"
+            $ref: "#/components/schemas/CompleteProfile"
+          example:
+            user_id: "abcdef0123456789"
+            nickname: "Maria"
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     photo:
       description: The binary data of a photo
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/raw_photo"
+            $ref: "#/components/schemas/RawPhoto"
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 #_____________________________________________________________________________________________________
   securitySchemes:

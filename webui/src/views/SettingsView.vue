@@ -4,6 +4,7 @@ export default {
 		return {
 			errormsg: null,
 			nickname: "",
+			avatarPreviewUrl: null,
 		}
 	},
 
@@ -16,6 +17,26 @@ export default {
 				})
 
 				this.nickname=""
+			}catch (e){
+				this.errormsg = e.toString();
+			}
+		},
+		async uploadAvatar(){
+			try{
+				this.errormsg = null;
+				let fileInput = document.getElementById('avatarUploader')
+				const file = fileInput.files[0];
+				if (!file) return;
+
+				const reader = new FileReader();
+				reader.readAsArrayBuffer(file);
+
+				reader.onload = async () => {
+					await this.$axios.put("/users/"+this.$route.params.id+"/photo", reader.result, {
+						headers: { 'Content-Type': file.type },
+					})
+					this.avatarPreviewUrl = URL.createObjectURL(file)
+				};
 			}catch (e){
 				this.errormsg = e.toString();
 			}
@@ -62,6 +83,17 @@ export default {
 						:disabled="nickname === null || nickname.length >16 || nickname.length <3 || nickname.trim().length===0">
 						Modify</button>
 					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row mt-3">
+			<div class="col d-flex justify-content-center">
+				<div class="d-flex flex-column align-items-center">
+					<label class="mb-2"><strong>Profile photo</strong></label>
+					<input id="avatarUploader" type="file" accept="image/png,image/jpeg" class="form-control mb-2" style="max-width: 320px;">
+					<button class="btn btn-outline-secondary mb-3" @click="uploadAvatar">Upload</button>
+					<img v-if="avatarPreviewUrl" :src="avatarPreviewUrl" alt="Profile photo preview" style="max-width: 160px; max-height: 160px; border-radius: 50%;">
 				</div>
 			</div>
 		</div>

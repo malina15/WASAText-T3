@@ -37,6 +37,13 @@ import (
 // Errors section
 var ErrPhotoDoesntExist = errors.New("photo doesn't exist")
 var ErrUserBanned = errors.New("user is banned")
+var ErrNicknameAlreadyTaken = errors.New("nickname already taken")
+var ErrGroupNotFound = errors.New("group not found")
+var ErrUserAlreadyInGroup = errors.New("user already in group")
+var ErrUserNotInGroup = errors.New("user not in group")
+var ErrUserPhotoNotFound = errors.New("user photo not found")
+var ErrMessageNotFound = errors.New("message not found")
+var ErrForbiddenMessageAction = errors.New("forbidden message action")
 
 /*
 var ErrUserAutoLike = errors.New("users can't like their own photos")
@@ -111,6 +118,42 @@ type AppDatabase interface {
 	// Gets the nickname of a user. Returns the nickname and an error
 	GetNickname(User) (string, error)
 
+	// Finds a user by nickname. Returns the user, whether it was found, and an error
+	FindUserByNickname(nickname string) (User, bool, error)
+
+	// Creates a group and returns its identifier
+	CreateGroup(creator User, name string, members []User) (int64, error)
+
+	// Adds an existing user to an existing group
+	AddUserToGroup(groupId int64, user User) error
+
+	// Removes a user from a group
+	RemoveUserFromGroup(groupId int64, user User) error
+
+	// Checks if a user is member of a group
+	IsUserInGroup(groupId int64, user User) (bool, error)
+
+	// Updates group name
+	SetGroupName(groupId int64, name string) error
+
+	// Updates group photo path (local server path)
+	SetGroupPhotoPath(groupId int64, photoPath string) error
+
+	// Retrieves group info
+	GetGroup(groupId int64) (Group, error)
+
+	// Lists groups of a user
+	ListGroupsForUser(user User) ([]Group, error)
+
+	// Sets user's profile photo path (local server path)
+	SetUserPhotoPath(user User, photoPath string) error
+
+	// Gets user's profile photo path (local server path)
+	GetUserPhotoPath(user User) (string, error)
+
+	// Lists conversations (direct peers and groups), sorted by last activity (reverse chronological)
+	ListConversations(user User) ([]Conversation, error)
+
 	// Checks if a user (a) is banned by another (b). Returns a boolean
 	BannedUserCheck(a User, b User) (bool, error)
 
@@ -126,6 +169,30 @@ type AppDatabase interface {
     // Chat methods
     CreateMessage(from User, to User, body string) (int64, error)
     ListMessages(a User, b User, limit int, offset int) ([]Message, error)
+
+	// Group chat methods
+	CreateGroupMessage(groupId int64, from User, body string) (int64, error)
+	ListGroupMessages(groupId int64, limit int, offset int) ([]GroupMessage, error)
+
+	// Message operations (delete / reactions)
+	GetDirectMessageInConversation(a User, b User, messageId int64) (Message, error)
+	GetGroupMessageInGroup(groupId int64, messageId int64) (GroupMessage, error)
+	DeleteDirectMessage(messageId int64, deletedBy User) error
+	DeleteGroupMessage(groupId int64, messageId int64, deletedBy User) error
+
+	SetDirectMessageReaction(messageId int64, user User, reaction string) error
+	RemoveDirectMessageReaction(messageId int64, user User) error
+	ListDirectMessageReactions(messageId int64) ([]MessageReaction, error)
+
+	SetGroupMessageReaction(groupId int64, messageId int64, user User, reaction string) error
+	RemoveGroupMessageReaction(groupId int64, messageId int64, user User) error
+	ListGroupMessageReactions(groupId int64, messageId int64) ([]MessageReaction, error)
+
+	// Read receipts (checkmarks)
+	MarkDirectConversationRead(reader User, peer User) error
+	MarkGroupConversationRead(groupId int64, reader User) error
+	GetDirectMessageCheckmarks(messageId int64) (int, error)
+	GetGroupMessageCheckmarks(groupId int64, messageId int64) (int, error)
 }
 
 type appdbimpl struct {
@@ -146,14 +213,11 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, fmt.Errorf("error setting pragmas: %w", errPramga)
 	}
 
-	// Check if table exists. If not, the database is empty, and we need to create the structure
-	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
-	if errors.Is(err, sql.ErrNoRows) {
-		err = createDatabase(db)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
+	// Ensure all required tables exist (CREATE TABLE IF NOT EXISTS).
+	// This also works as a minimal migration step when new tables are added.
+	err := createDatabase(db)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
 	return &appdbimpl{
@@ -167,10 +231,28 @@ func (db *appdbimpl) Ping() error {
 
 // Creates all the necessary sql tables for the WASAPhoto app.
 func createDatabase(db *sql.DB) error {
-    tables := [7]string{
+    tables := [17]string{
 		`CREATE TABLE IF NOT EXISTS users (
 			id_user VARCHAR(16) NOT NULL PRIMARY KEY,
 			nickname VARCHAR(16) NOT NULL
+			);`,
+		`CREATE TABLE IF NOT EXISTS user_photos (
+			id_user VARCHAR(16) NOT NULL PRIMARY KEY,
+			photo_path TEXT NOT NULL,
+			FOREIGN KEY(id_user) REFERENCES users (id_user) ON DELETE CASCADE
+			);`,
+		`CREATE TABLE IF NOT EXISTS groups (
+			id_group INTEGER PRIMARY KEY AUTOINCREMENT,
+			name TEXT NOT NULL,
+			photo_path TEXT NOT NULL DEFAULT '',
+			created_at DATETIME NOT NULL
+			);`,
+		`CREATE TABLE IF NOT EXISTS group_members (
+			id_group INTEGER NOT NULL,
+			id_user VARCHAR(16) NOT NULL,
+			PRIMARY KEY (id_group, id_user),
+			FOREIGN KEY(id_group) REFERENCES groups (id_group) ON DELETE CASCADE,
+			FOREIGN KEY(id_user) REFERENCES users (id_user) ON DELETE CASCADE
 			);`,
 		`CREATE TABLE IF NOT EXISTS photos (
 			id_photo INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -215,6 +297,68 @@ func createDatabase(db *sql.DB) error {
             FOREIGN KEY(sender) REFERENCES users (id_user) ON DELETE CASCADE,
             FOREIGN KEY(receiver) REFERENCES users (id_user) ON DELETE CASCADE
             );`,
+		`CREATE TABLE IF NOT EXISTS group_messages (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			id_group INTEGER NOT NULL,
+			sender VARCHAR(16) NOT NULL,
+			body TEXT NOT NULL,
+			date DATETIME NOT NULL,
+			FOREIGN KEY(id_group) REFERENCES groups (id_group) ON DELETE CASCADE,
+			FOREIGN KEY(sender) REFERENCES users (id_user) ON DELETE CASCADE
+			);`,
+		`CREATE TABLE IF NOT EXISTS direct_message_deletions (
+			message_id INTEGER NOT NULL PRIMARY KEY,
+			deleted_at DATETIME NOT NULL,
+			deleted_by VARCHAR(16) NOT NULL,
+			FOREIGN KEY(message_id) REFERENCES messages (id) ON DELETE CASCADE,
+			FOREIGN KEY(deleted_by) REFERENCES users (id_user) ON DELETE CASCADE
+			);`,
+		`CREATE TABLE IF NOT EXISTS group_message_deletions (
+			message_id INTEGER NOT NULL PRIMARY KEY,
+			id_group INTEGER NOT NULL,
+			deleted_at DATETIME NOT NULL,
+			deleted_by VARCHAR(16) NOT NULL,
+			FOREIGN KEY(message_id) REFERENCES group_messages (id) ON DELETE CASCADE,
+			FOREIGN KEY(id_group) REFERENCES groups (id_group) ON DELETE CASCADE,
+			FOREIGN KEY(deleted_by) REFERENCES users (id_user) ON DELETE CASCADE
+			);`,
+		`CREATE TABLE IF NOT EXISTS direct_message_reactions (
+			message_id INTEGER NOT NULL,
+			id_user VARCHAR(16) NOT NULL,
+			reaction TEXT NOT NULL,
+			created_at DATETIME NOT NULL,
+			PRIMARY KEY (message_id, id_user),
+			FOREIGN KEY(message_id) REFERENCES messages (id) ON DELETE CASCADE,
+			FOREIGN KEY(id_user) REFERENCES users (id_user) ON DELETE CASCADE
+			);`,
+		`CREATE TABLE IF NOT EXISTS group_message_reactions (
+			message_id INTEGER NOT NULL,
+			id_user VARCHAR(16) NOT NULL,
+			reaction TEXT NOT NULL,
+			created_at DATETIME NOT NULL,
+			PRIMARY KEY (message_id, id_user),
+			FOREIGN KEY(message_id) REFERENCES group_messages (id) ON DELETE CASCADE,
+			FOREIGN KEY(id_user) REFERENCES users (id_user) ON DELETE CASCADE
+			);`,
+		`CREATE TABLE IF NOT EXISTS direct_message_receipts (
+			message_id INTEGER NOT NULL PRIMARY KEY,
+			receiver_id VARCHAR(16) NOT NULL,
+			received_at DATETIME NOT NULL,
+			read_at DATETIME,
+			FOREIGN KEY(message_id) REFERENCES messages (id) ON DELETE CASCADE,
+			FOREIGN KEY(receiver_id) REFERENCES users (id_user) ON DELETE CASCADE
+			);`,
+		`CREATE TABLE IF NOT EXISTS group_message_receipts (
+			message_id INTEGER NOT NULL,
+			id_group INTEGER NOT NULL,
+			id_user VARCHAR(16) NOT NULL,
+			received_at DATETIME NOT NULL,
+			read_at DATETIME,
+			PRIMARY KEY (message_id, id_user),
+			FOREIGN KEY(message_id) REFERENCES group_messages (id) ON DELETE CASCADE,
+			FOREIGN KEY(id_group) REFERENCES groups (id_group) ON DELETE CASCADE,
+			FOREIGN KEY(id_user) REFERENCES users (id_user) ON DELETE CASCADE
+			);`,
 	}
 
 	// Iteration to create all the needed sql schemas

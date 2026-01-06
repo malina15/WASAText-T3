@@ -2,8 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"new-wasa/service/api/reqcontext"
+	"new-wasa/service/database"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -35,6 +37,10 @@ func (rt *_router) putNickname(w http.ResponseWriter, r *http.Request, ps httpro
 		nick.ToDatabase())
 	if err != nil {
 		ctx.Logger.WithError(err).Error("update-nickname: error executing update query")
+		if errors.Is(err, database.ErrNicknameAlreadyTaken) {
+			w.WriteHeader(http.StatusConflict)
+			return
+		}
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

@@ -14,10 +14,10 @@ export default {
 			try {
 				// Login (POST): "/session"
 				let response = await this.$axios.post("/session",{
-					user_id: this.identifier.trim()
+					name: this.identifier.trim()
 				});
 
-				localStorage.setItem('token',response.data.user_id);
+				localStorage.setItem('token',response.data.identifier);
 				this.$router.replace("/home")
 				this.$emit('updatedLoggedChild',true)
 				

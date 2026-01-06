@@ -127,6 +127,9 @@ func run() error {
 		return fmt.Errorf("registering web UI handler: %w", err)
 	}
 
+	// Allow APIs to be served both under / and /v1 (OpenAPI lint requires a major version segment).
+	router = stripPathPrefix("/v1", router)
+
 	// Apply CORS policy
 	router = applyCORSHandler(router)
 

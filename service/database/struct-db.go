@@ -69,4 +69,39 @@ type Message struct {
     Receiver string    `json:"receiver"`
     Body     string    `json:"body"`
     Date     time.Time `json:"date"`
+	Status   int       `json:"status,omitempty"`
+	Reactions []MessageReaction `json:"reactions,omitempty"`
+}
+
+// GroupMessage structure for the database
+type GroupMessage struct {
+	Id      int64     `json:"id"`
+	GroupID int64     `json:"group_id"`
+	Sender  string    `json:"sender"`
+	Body    string    `json:"body"`
+	Date    time.Time `json:"date"`
+}
+
+// MessageReaction structure for the database
+type MessageReaction struct {
+	UserID   string `json:"user_id"`
+	Reaction string `json:"reaction"`
+}
+
+// Conversation structure for the database
+type Conversation struct {
+	Peer               string    `json:"peer"`
+	IsGroup            bool      `json:"isGroup"`
+	Name               string    `json:"name"`
+	PhotoURL           string    `json:"photoUrl"`
+	LastMessageAt      time.Time `json:"lastMessageAt"`
+	LastMessagePreview string    `json:"lastMessagePreview"`
+}
+
+// Group structure for the database
+type Group struct {
+	Id        int64     `json:"group_id"`
+	Name      string    `json:"name"`
+	PhotoPath string    `json:"photo_path"`
+	CreatedAt time.Time `json:"created_at"`
 }

@@ -16,7 +16,16 @@ func (db *appdbimpl) GetNickname(user User) (string, error) {
 // Database function that modifies a user's nickname
 func (db *appdbimpl) ModifyNickname(user User, newNickname Nickname) error {
 
-	_, err := db.c.Exec(`UPDATE users SET nickname = ? WHERE id_user = ?`, newNickname.Nickname, user.IdUser)
+	// Ensure nickname uniqueness (required by the project specs).
+	existingUser, found, err := db.FindUserByNickname(newNickname.Nickname)
+	if err != nil {
+		return err
+	}
+	if found && existingUser.IdUser != user.IdUser {
+		return ErrNicknameAlreadyTaken
+	}
+
+	_, err = db.c.Exec(`UPDATE users SET nickname = ? WHERE id_user = ?`, newNickname.Nickname, user.IdUser)
 	if err != nil {
 		// Error during the execution of the query
 		return err

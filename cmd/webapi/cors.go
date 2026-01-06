@@ -18,5 +18,6 @@ func applyCORSHandler(h http.Handler) http.Handler {
 		}),
 		handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS", "DELETE", "PUT"}),
 		handlers.AllowedOrigins([]string{"*"}),
+		handlers.MaxAge(1),
 	)(h)
 }

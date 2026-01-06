@@ -1,6 +1,7 @@
 package database
 
 import (
+    "database/sql"
     "time"
 )
 // Database function that gets the stream of a user (photos of people that are followed by the latter)
@@ -56,16 +57,45 @@ func (db *appdbimpl) GetAllUsers() ([]User, error) {
 
 // CreateMessage inserts a direct message between two users
 func (db *appdbimpl) CreateMessage(from User, to User, body string) (int64, error) {
-    res, err := db.c.Exec("INSERT INTO messages (sender, receiver, body, date) VALUES (?,?,?,?)", from.IdUser, to.IdUser, body, time.Now())
-    if err != nil {
-        return 0, err
-    }
-    return res.LastInsertId()
+	tx, err := db.c.Begin()
+	if err != nil {
+		return 0, err
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	now := time.Now().UTC()
+	res, err := tx.Exec("INSERT INTO messages (sender, receiver, body, date) VALUES (?,?,?,?)", from.IdUser, to.IdUser, body, now)
+	if err != nil {
+		return 0, err
+	}
+	messageID, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	// Mark as received for receiver (read_at will be set when receiver reads the conversation).
+	_, err = tx.Exec(
+		"INSERT OR REPLACE INTO direct_message_receipts (message_id, receiver_id, received_at, read_at) VALUES (?,?,?,NULL)",
+		messageID, to.IdUser, now,
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return 0, err
+	}
+	return messageID, nil
 }
 
-// ListMessages returns messages between a and b ordered by date ascending
+// ListMessages returns messages between a and b ordered by date descending (reverse chronological)
 func (db *appdbimpl) ListMessages(a User, b User, limit int, offset int) ([]Message, error) {
-    rows, err := db.c.Query("SELECT id, sender, receiver, body, date FROM messages WHERE (sender=? AND receiver=?) OR (sender=? AND receiver=?) ORDER BY date ASC LIMIT ? OFFSET ?", a.IdUser, b.IdUser, b.IdUser, a.IdUser, limit, offset)
+    rows, err := db.c.Query(
+		"SELECT id, sender, receiver, body, date FROM messages "+
+			"WHERE ((sender=? AND receiver=?) OR (sender=? AND receiver=?)) "+
+			directMessageNotDeletedClause +
+			"ORDER BY date DESC LIMIT ? OFFSET ?",
+		a.IdUser, b.IdUser, b.IdUser, a.IdUser, limit, offset)
     if err != nil {
         return nil, err
     }
@@ -97,6 +127,20 @@ func (db *appdbimpl) CreateUser(u User) error {
 	}
 
 	return nil
+}
+
+// FindUserByNickname returns the user identifier of the user that owns the given nickname.
+// It returns found=false if the nickname does not exist.
+func (db *appdbimpl) FindUserByNickname(nickname string) (User, bool, error) {
+	var id string
+	err := db.c.QueryRow("SELECT id_user FROM users WHERE nickname = ?", nickname).Scan(&id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return User{}, false, nil
+		}
+		return User{}, false, err
+	}
+	return User{IdUser: id}, true, nil
 }
 
 // [EXTRA] Database function that checks if a user exists
