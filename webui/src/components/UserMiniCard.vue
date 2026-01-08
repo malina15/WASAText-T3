@@ -31,10 +31,10 @@ export default {
 }
 
 .user-mini-card{
-    color: black;
+    color: var(--pf-text) !important;
     width: 25%;
-    border: none;
-    border-color: black;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
 }
 
 .user-mini-card-title:hover{

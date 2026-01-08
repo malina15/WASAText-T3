@@ -23,14 +23,17 @@ body {
       "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
-/* Ensure readability on light surfaces */
-.card, .card * {
+/* Ensure readability on light surfaces (non-transparent cards) */
+.card:not(.bg-transparent), .card:not(.bg-transparent) * {
   color: #111827;
 }
-
-/* Ensure common Bootstrap components are readable on the dark background even if Bootstrap isn't loaded/overridden */
-.card {
+.card:not(.bg-transparent) {
   background: rgba(255, 255, 255, 0.92);
+}
+
+/* Transparent cards are used on the dark background */
+.card.bg-transparent, .card.bg-transparent * {
+  color: var(--pf-text) !important;
 }
 .list-group-item {
   background: rgba(255, 255, 255, 0.92);

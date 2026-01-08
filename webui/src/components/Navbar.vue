@@ -75,12 +75,12 @@ export default {
   color: #ffffff !important;
 }
 .my-nav .form-control {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.92);
   border-color: rgba(255,255,255,0.25);
-  color: #ffffff !important;
+  color: #111827 !important;
 }
 .my-nav .form-control::placeholder{
-  color: rgba(255,255,255,0.7) !important;
+  color: rgba(17, 24, 39, 0.6) !important;
 }
 .my-nav:hover{
   cursor: pointer;

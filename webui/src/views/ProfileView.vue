@@ -281,13 +281,22 @@ export default {
 }
 
 .my-btn-add-photo{
-    background-color: green;
-    border-color: grey;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--pf-accent, #8b5cf6), var(--pf-accent-2, #22d3ee));
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #ffffff !important;
+    border-radius: 10px;
+    padding: 0.45rem 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
 }
 .my-btn-add-photo:hover{
-    color: white;
-    background-color: green;
-    border-color: grey;
+    color: #ffffff !important;
+    filter: brightness(1.05);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+}
+.my-btn-add-photo:active{
+    transform: translateY(1px);
 }
 
 </style>
