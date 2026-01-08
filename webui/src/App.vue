@@ -65,7 +65,7 @@ export default {
 					:searchValue="searchValue"/>
 
             <footer class="py-3 px-4 text-center" style="opacity:.7;">
-              <small>WASAgram • a social media sharing UI</small>
+              <small>WASAText • messaging web UI</small>
             </footer>
 				</main>
 			</div>

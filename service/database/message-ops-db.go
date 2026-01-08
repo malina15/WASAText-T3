@@ -242,5 +242,3 @@ func (db *appdbimpl) ListGroupMessageReactions(groupId int64, messageId int64) (
 	}
 	return out, nil
 }
-
-

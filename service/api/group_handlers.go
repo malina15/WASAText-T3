@@ -339,5 +339,3 @@ func (rt *_router) getGroupPhoto(w http.ResponseWriter, r *http.Request, ps http
 
 	http.ServeFile(w, r, filepath.Join(photoFolder, group.PhotoPath))
 }
-
-

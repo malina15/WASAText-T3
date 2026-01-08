@@ -337,5 +337,3 @@ func (rt *_router) forwardMessage(w http.ResponseWriter, r *http.Request, ps htt
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
-
-

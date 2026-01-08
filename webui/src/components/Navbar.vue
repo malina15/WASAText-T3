@@ -37,7 +37,7 @@ export default {
       <div class="col-4">
           <a class="navbar-brand ms-2 d-flex" @click="goBackHome">
               <img class="brand-img" src="/favicon.ico">
-              <div>WASAgram</div>
+              <div>WASAText</div>
           </a>
       </div>
 

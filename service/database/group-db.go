@@ -166,5 +166,3 @@ func (db *appdbimpl) ListGroupsForUser(user User) ([]Group, error) {
 	}
 	return groups, nil
 }
-
-

@@ -1,9 +1,10 @@
 package database
 
 import (
-    "database/sql"
-    "time"
+	"database/sql"
+	"time"
 )
+
 // Database function that gets the stream of a user (photos of people that are followed by the latter)
 func (db *appdbimpl) GetStream(user User) ([]Photo, error) {
 
@@ -90,30 +91,30 @@ func (db *appdbimpl) CreateMessage(from User, to User, body string) (int64, erro
 
 // ListMessages returns messages between a and b ordered by date descending (reverse chronological)
 func (db *appdbimpl) ListMessages(a User, b User, limit int, offset int) ([]Message, error) {
-    rows, err := db.c.Query(
+	rows, err := db.c.Query(
 		"SELECT id, sender, receiver, body, date FROM messages "+
 			"WHERE ((sender=? AND receiver=?) OR (sender=? AND receiver=?)) "+
-			directMessageNotDeletedClause +
+			directMessageNotDeletedClause+
 			"ORDER BY date DESC LIMIT ? OFFSET ?",
 		a.IdUser, b.IdUser, b.IdUser, a.IdUser, limit, offset)
-    if err != nil {
-        return nil, err
-    }
-    defer func() { _ = rows.Close() }()
-    var msgs []Message
-    for rows.Next() {
-        var m Message
-        var dt time.Time
-        if err := rows.Scan(&m.Id, &m.Sender, &m.Receiver, &m.Body, &dt); err != nil {
-            return nil, err
-        }
-        m.Date = dt
-        msgs = append(msgs, m)
-    }
-    if rows.Err() != nil {
-        return nil, rows.Err()
-    }
-    return msgs, nil
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = rows.Close() }()
+	var msgs []Message
+	for rows.Next() {
+		var m Message
+		var dt time.Time
+		if err := rows.Scan(&m.Id, &m.Sender, &m.Receiver, &m.Body, &dt); err != nil {
+			return nil, err
+		}
+		m.Date = dt
+		msgs = append(msgs, m)
+	}
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	return msgs, nil
 }
 
 // Database function that adds a new user in the database upon registration

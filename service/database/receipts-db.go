@@ -62,5 +62,3 @@ func (db *appdbimpl) GetGroupMessageCheckmarks(groupId int64, messageId int64) (
 	}
 	return 1, nil
 }
-
-

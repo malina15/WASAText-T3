@@ -64,12 +64,12 @@ type CompleteComment struct {
 
 // Message structure for the database (direct chat message)
 type Message struct {
-    Id       int64     `json:"id"`
-    Sender   string    `json:"sender"`
-    Receiver string    `json:"receiver"`
-    Body     string    `json:"body"`
-    Date     time.Time `json:"date"`
-	Status   int       `json:"status,omitempty"`
+	Id        int64             `json:"id"`
+	Sender    string            `json:"sender"`
+	Receiver  string            `json:"receiver"`
+	Body      string            `json:"body"`
+	Date      time.Time         `json:"date"`
+	Status    int               `json:"status,omitempty"`
 	Reactions []MessageReaction `json:"reactions,omitempty"`
 }
 

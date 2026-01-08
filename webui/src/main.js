@@ -15,6 +15,9 @@ import LikeModal from './components/LikeModal.vue'
 import CommentModal from './components/CommentModal.vue'
 import PhotoComment from './components/PhotoComment.vue'
 
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'
+
 import './assets/dashboard.css'
 import './assets/main.css'
 

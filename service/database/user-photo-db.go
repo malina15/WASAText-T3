@@ -22,5 +22,3 @@ func (db *appdbimpl) GetUserPhotoPath(user User) (string, error) {
 	}
 	return path, nil
 }
-
-

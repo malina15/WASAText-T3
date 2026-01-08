@@ -72,6 +72,11 @@ func (rt *_router) postPhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 	// Create the user's folder locally to save his/her images
 	photoPath := getUserPhotoFolder(auth)
+	if err := os.MkdirAll(photoPath, os.ModePerm); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("photo-upload: error creating local photo directory")
+		return
+	}
 
 	// Create an empty file for storing the body content (image)
 	out, err := os.Create(filepath.Join(photoPath, photoId))

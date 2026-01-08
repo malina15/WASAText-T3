@@ -106,5 +106,3 @@ func (rt *_router) getUserPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 	http.ServeFile(w, r, filepath.Join(photoFolder, photoPath))
 }
-
-

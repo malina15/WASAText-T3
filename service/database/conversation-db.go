@@ -24,8 +24,8 @@ func (db *appdbimpl) ListConversations(user User) ([]Conversation, error) {
 		"SELECT CASE WHEN sender = ? THEN receiver ELSE sender END AS peer_id, "+
 			"MAX(CAST(strftime('%s', date) AS INTEGER)) AS last_ts "+
 			"FROM messages "+
-			"WHERE (sender = ? OR receiver = ?) " +
-			directMessageNotDeletedClause +
+			"WHERE (sender = ? OR receiver = ?) "+
+			directMessageNotDeletedClause+
 			"GROUP BY peer_id",
 		user.IdUser, user.IdUser, user.IdUser,
 	)
@@ -47,7 +47,7 @@ func (db *appdbimpl) ListConversations(user User) ([]Conversation, error) {
 		_ = db.c.QueryRow(
 			"SELECT body FROM messages "+
 				"WHERE ((sender=? AND receiver=?) OR (sender=? AND receiver=?)) "+
-				directMessageNotDeletedClause +
+				directMessageNotDeletedClause+
 				"ORDER BY date DESC LIMIT 1",
 			user.IdUser, peerID, peerID, user.IdUser,
 		).Scan(&lastBody)
@@ -114,5 +114,3 @@ func snippet(s string, max int) string {
 	}
 	return s[:max]
 }
-
-

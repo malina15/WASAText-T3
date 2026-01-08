@@ -28,6 +28,21 @@ body {
   color: #111827;
 }
 
+/* Ensure common Bootstrap components are readable on the dark background even if Bootstrap isn't loaded/overridden */
+.card {
+  background: rgba(255, 255, 255, 0.92);
+}
+.list-group-item {
+  background: rgba(255, 255, 255, 0.92);
+  color: #111827;
+}
+.list-group-item * {
+  color: #111827;
+}
+.modal-content, .modal-content * {
+  color: #111827;
+}
+
 .user {
     background-color: rgba(255,255,255,0.04);
     border-radius: 12px;

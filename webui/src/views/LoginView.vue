@@ -18,7 +18,7 @@ export default {
 				});
 
 				localStorage.setItem('token',response.data.identifier);
-				this.$router.replace("/home")
+				this.$router.replace("/chats")
 				this.$emit('updatedLoggedChild',true)
 				
 			} catch (e) {
@@ -29,7 +29,7 @@ export default {
 	},
 	mounted(){
 		if (localStorage.getItem('token')){
-			this.$router.replace("/home")
+			this.$router.replace("/chats")
 		}
 	},
 	
@@ -51,7 +51,7 @@ export default {
 
 				<div class="row mt-2 mb-3 border-bottom">
 					<div class="col">
-                        <h2 class="login-title">WASAgram Login</h2>
+                        <h2 class="login-title">WASAText Login</h2>
 					</div>
 				</div>
 
@@ -63,7 +63,7 @@ export default {
 						v-model="identifier" 
 						maxlength="16"
 						minlength="3"
-						placeholder="Your identifier" />
+						placeholder="Your name" />
 					</div>
 				</div>
 
@@ -81,11 +81,11 @@ export default {
 
 <style>
 .login {
-    background-image: url("../assets/images/people.png");
+    background: linear-gradient(135deg, var(--pf-bg), var(--pf-surface));
     height: 100vh;
 }
 
 .login-title {
-    color: black;
+    color: var(--pf-text);
 }
 </style>

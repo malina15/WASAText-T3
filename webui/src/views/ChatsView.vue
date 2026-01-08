@@ -55,7 +55,7 @@ export default {
         </div>
       </div>
     </div>
-    <div v-if="peers.length===0" class="text-muted">You are not following anyone yet.</div>
+    <div v-if="peers.length===0" class="text-muted">No conversations yet.</div>
     <ul class="list-group">
       <li v-for="(u,i) in peers" :key="i" class="list-group-item d-flex justify-content-between align-items-center" @click="open(u)">
         <div class="d-flex flex-column">
