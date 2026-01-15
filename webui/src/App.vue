@@ -65,7 +65,7 @@ export default {
 					:searchValue="searchValue"/>
 
             <footer class="py-3 px-4 text-center" style="opacity:.7;">
-              <small>WASAText • messaging web UI</small>
+              <small>WASAphoto • photo sharing (with optional messaging)</small>
             </footer>
 				</main>
 			</div>

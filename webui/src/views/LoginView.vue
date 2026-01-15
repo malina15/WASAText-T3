@@ -51,7 +51,7 @@ export default {
 
 				<div class="row mt-2 mb-3 border-bottom">
 					<div class="col">
-                        <h2 class="login-title">WASAText Login</h2>
+                        <h2 class="login-title">WASAphoto Login</h2>
 					</div>
 				</div>
 

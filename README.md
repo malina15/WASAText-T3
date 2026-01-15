@@ -1,9 +1,10 @@
-# WASAgram
+# WASAphoto
 
-WASAgram is a simple social media sharing app with:
+WASAphoto is a simple social media sharing app with:
 - authentication by identifier (session issuance)
 - user profiles (nickname, follow/unfollow, ban/unban)
 - photo posts (upload/delete, stream, likes, comments)
+- optional messaging (direct chats + groups)
 - responsive Vue 3 frontend and Go backend with SQLite
 
 ## How it works (in plain words)
