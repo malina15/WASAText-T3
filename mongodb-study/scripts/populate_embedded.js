@@ -143,6 +143,7 @@ for (let i = 0; i < CONVERSATIONS; i++) {
       joined_at: createdAt,
       role: "member"
     })),
+    participants_count: participants.length,
     created_at: createdAt,
     last_message_at: lastMessageAt,
     message_count: msgCount,
