@@ -231,3 +231,15 @@ Future research directions include investigation of multi-model databases, advan
 [3] Distributed Systems Theory. "Consistency Models in NoSQL Systems." Computer Science Review.
 [4] Web Scale Architecture. "Scaling Strategies for Real-time Applications." Systems Architecture Quarterly.
 [5] Performance Analysis Methods. "Benchmarking NoSQL Database Systems." Database Performance Journal.
+
+## How to run (Embedded demo)
+
+From repo root (`new-wasa`):
+
+```bash
+docker rm -f wasatext-mongo 2>/dev/null || true
+docker run -d --name wasatext-mongo -p 27017:27017 \
+  -v "$(pwd)/mongodb-study/scripts:/scripts" \
+  mongo:7
+
+docker exec -it wasatext-mongo mongosh
