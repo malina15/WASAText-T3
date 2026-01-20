@@ -243,3 +243,16 @@ docker run -d --name wasatext-mongo -p 27017:27017 \
   mongo:7
 
 docker exec -it wasatext-mongo mongosh
+```
+
+## Methodology
+
+All experiments were executed locally using Docker and MongoDB 7.x.
+The dataset was generated synthetically to ensure reproducibility and to
+simulate realistic messaging workloads.
+
+Query performance was evaluated using `explain()` plans before and after
+index creation. Metrics such as execution time, number of documents examined,
+and index usage were observed and compared.
+
+No production traffic or real user data was used in this study.
