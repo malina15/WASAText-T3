@@ -256,3 +256,5 @@ index creation. Metrics such as execution time, number of documents examined,
 and index usage were observed and compared.
 
 No production traffic or real user data was used in this study.
+
+
