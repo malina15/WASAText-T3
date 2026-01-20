@@ -1,0 +1,200 @@
+{
+  "schema_type": "embedded",
+  "description": "Denormalized MongoDB schema with nested documents and embedded relationships",
+  "collections": {
+    "users": {
+      "description": "User profiles remain separate for reference across conversations",
+      "sample_document": {
+        "_id": "ObjectId('507f1f77bcf86cd799439011')",
+        "username": "john_doe",
+        "email": "john.doe@example.com",
+        "display_name": "John Doe",
+        "avatar_url": "https://cdn.wasatext.com/avatars/john_doe.jpg",
+        "created_at": "ISODate('2024-01-15T10:30:00Z')",
+        "last_activity": "ISODate('2024-02-01T14:22:00Z')",
+        "is_online": true,
+        "status_message": "Available",
+        "preferences": {
+          "notifications_enabled": true,
+          "theme": "dark",
+          "language": "en"
+        },
+        "conversation_summaries": [
+          {
+            "conversation_id": "ObjectId('507f1f77bcf86cd799439012')",
+            "last_read_message_id": "ObjectId('507f1f77bcf86cd799439020')",
+            "unread_count": 3,
+            "is_muted": false
+          }
+        ]
+      },
+      "indexes": [
+        {"username": 1},
+        {"email": 1},
+        {"last_activity": -1}
+      ]
+    },
+    "conversations": {
+      "description": "Conversations with embedded messages, reactions, and receipts",
+      "sample_document": {
+        "_id": "ObjectId('507f1f77bcf86cd799439012')",
+        "type": "group",
+        "title": "Project Team Discussion",
+        "participants": [
+          {
+            "user_id": "ObjectId('507f1f77bcf86cd799439011')",
+            "username": "john_doe",
+            "display_name": "John Doe",
+            "joined_at": "ISODate('2024-01-20T09:15:00Z')",
+            "role": "admin"
+          },
+          {
+            "user_id": "ObjectId('507f1f77bcf86cd799439013')",
+            "username": "jane_smith",
+            "display_name": "Jane Smith",
+            "joined_at": "ISODate('2024-01-20T09:16:00Z')",
+            "role": "member"
+          }
+        ],
+        "created_by": "ObjectId('507f1f77bcf86cd799439011')",
+        "created_at": "ISODate('2024-01-20T09:15:00Z')",
+        "last_message_at": "ISODate('2024-02-01T16:45:00Z')",
+        "message_count": 247,
+        "is_archived": false,
+        "settings": {
+          "mute_notifications": false,
+          "allow_invites": true,
+          "message_retention_days": 365
+        },
+        "messages": [
+          {
+            "_id": "ObjectId('507f1f77bcf86cd799439015')",
+            "sender": {
+              "user_id": "ObjectId('507f1f77bcf86cd799439011')",
+              "username": "john_doe",
+              "display_name": "John Doe"
+            },
+            "content": "Hey everyone, just wanted to share the latest project updates.",
+            "message_type": "text",
+            "timestamp": "ISODate('2024-02-01T16:45:00Z')",
+            "edited_at": null,
+            "reply_to": null,
+            "attachments": [],
+            "metadata": {
+              "client_id": "web-app-v2.1",
+              "ip_address": "192.168.1.100"
+            },
+            "is_deleted": false,
+            "reactions": [
+              {
+                "_id": "ObjectId('507f1f77bcf86cd799439016')",
+                "user_id": "ObjectId('507f1f77bcf86cd799439013')",
+                "username": "jane_smith",
+                "reaction_type": "like",
+                "timestamp": "ISODate('2024-02-01T16:47:00Z')"
+              },
+              {
+                "_id": "ObjectId('507f1f77bcf86cd799439018')",
+                "user_id": "ObjectId('507f1f77bcf86cd799439014')",
+                "username": "mike_wilson",
+                "reaction_type": "love",
+                "timestamp": "ISODate('2024-02-01T16:50:00Z')"
+              }
+            ],
+            "receipts": [
+              {
+                "user_id": "ObjectId('507f1f77bcf86cd799439013')",
+                "status": "read",
+                "delivered_at": "ISODate('2024-02-01T16:45:30Z')",
+                "read_at": "ISODate('2024-02-01T17:12:00Z')"
+              },
+              {
+                "user_id": "ObjectId('507f1f77bcf86cd799439014')",
+                "status": "delivered",
+                "delivered_at": "ISODate('2024-02-01T16:45:45Z')",
+                "read_at": null
+              }
+            ]
+          },
+          {
+            "_id": "ObjectId('507f1f77bcf86cd799439019')",
+            "sender": {
+              "user_id": "ObjectId('507f1f77bcf86cd799439013')",
+              "username": "jane_smith",
+              "display_name": "Jane Smith"
+            },
+            "content": "Thanks for the update! Looking forward to reviewing the details.",
+            "message_type": "text",
+            "timestamp": "ISODate('2024-02-01T17:15:00Z')",
+            "edited_at": null,
+            "reply_to": "ObjectId('507f1f77bcf86cd799439015')",
+            "attachments": [],
+            "metadata": {
+              "client_id": "mobile-app-v1.8",
+              "device_type": "android"
+            },
+            "is_deleted": false,
+            "reactions": [],
+            "receipts": [
+              {
+                "user_id": "ObjectId('507f1f77bcf86cd799439011')",
+                "status": "read",
+                "delivered_at": "ISODate('2024-02-01T17:15:05Z')",
+                "read_at": "ISODate('2024-02-01T17:18:00Z')"
+              }
+            ]
+          }
+        ]
+      },
+      "indexes": [
+        {"participants.user_id": 1},
+        {"last_message_at": -1},
+        {"created_at": -1},
+        {"messages.timestamp": -1},
+        {"messages.sender.user_id": 1, "messages.timestamp": -1},
+        {"type": 1, "is_archived": 1}
+      ]
+    }
+  },
+  "design_principles": {
+    "denormalization": "Related entities embedded within parent documents",
+    "atomic_operations": "Single document updates ensure consistency",
+    "data_locality": "Complete conversation data available in single query",
+    "document_growth": "Documents grow over time as messages are added",
+    "read_optimization": "Optimized for conversation retrieval patterns"
+  },
+  "trade_offs": {
+    "advantages": [
+      "Single query retrieval for complete conversation data",
+      "Atomic operations for message and reaction updates",
+      "Reduced network latency for conversation loading",
+      "Natural representation of hierarchical message structure",
+      "Simplified application logic for conversation operations",
+      "Better cache locality for conversation data"
+    ],
+    "disadvantages": [
+      "Document size growth over time may hit 16MB BSON limit",
+      "Data duplication for user information across conversations",
+      "Complex queries for cross-conversation analytics",
+      "Potential memory overhead for large conversations",
+      "Indexing challenges on embedded array fields",
+      "Migration complexity when restructuring embedded data"
+    ]
+  },
+  "size_considerations": {
+    "document_growth_pattern": "Linear growth with message addition",
+    "estimated_max_size": "Large group conversations may reach 5-8MB",
+    "mitigation_strategies": [
+      "Archive old messages to separate collection",
+      "Implement conversation splitting for very large groups",
+      "Use message pagination within embedded arrays",
+      "Monitor document sizes and implement alerts"
+    ]
+  },
+  "query_optimization": {
+    "embedded_array_queries": "Use positional operators for specific message updates",
+    "pagination_strategy": "Implement skip/limit on embedded message arrays",
+    "aggregation_pipelines": "Leverage $unwind for message-level analysis",
+    "index_selection": "Compound indexes on conversation and embedded message fields"
+  }
+}
