@@ -98,3 +98,62 @@ docker compose up -d --build
 - CORS is enabled with preflight support; default max-age is 1s.
 - Nginx in the frontend container proxies API paths to the backend service.
 - Backend listens on `0.0.0.0:3000` by default when containerized.
+
+
+## T3 — MongoDB study (WASAText)
+
+This repository also contains the **T3 deliverable** for MongoDB schema design and scaling analysis, based on a messaging system called **WASAText**.
+The MongoDB work is **independent from the main WASAphoto application logic** and is included strictly for database modeling and performance analysis purposes.
+
+All T3 materials are located in:
+
+- `mongodb-study/` (paper + schemas + dataset + scripts + benchmarks)
+
+---
+
+### Quick run (embedded schema demo)
+
+From the repository root (`new-wasa`), run:
+
+```bash
+cd new-wasa
+docker rm -f wasatext-mongo 2>/dev/null || true
+docker run -d --name wasatext-mongo -p 27017:27017 \
+  -v "$(pwd)/mongodb-study/scripts:/scripts" \
+  mongo:7
+docker exec -it wasatext-mongo mongosh
+```
+
+Then, **inside the MongoDB shell (`mongosh`)**, run:
+
+```js
+load("/scripts/populate_embedded.js")
+use wasatext_embedded
+show collections
+db.users.countDocuments()
+db.conversations.countDocuments()
+```
+
+This will:
+- create a synthetic messaging dataset
+- populate an **embedded MongoDB schema**
+- allow interactive queries and performance benchmarking
+
+---
+
+### Documentation and Results
+
+- **Benchmark results:** `mongodb-study/benchmarks/results.md`
+- **Dataset description:** `mongodb-study/dataset/dataset_description.md`
+- **Schemas:**
+  - Embedded: `mongodb-study/schemas/schema_embedded.json`
+  - Referenced: `mongodb-study/schemas/schema_referenced.json`
+- **Population script:** `mongodb-study/scripts/populate_embedded.js`
+
+---
+
+### Notes
+
+- MongoDB is used **only for T3 analysis**, not for the main WASAphoto runtime.
+- The study compares **embedded vs referenced document models**, indexing strategies, and scaling considerations.
+- All data is **synthetic** and generated locally.
