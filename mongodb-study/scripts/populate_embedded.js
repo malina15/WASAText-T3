@@ -1,3 +1,5 @@
+load("/scripts/lib/random.js");
+
 // MongoDB Script: Populate Embedded Schema for WASAText (WORKING)
 // Embedded model: conversations contain embedded messages (and embedded reactions/receipts).
 // Run inside container mongosh: load("/scripts/populate_embedded.js")
@@ -13,17 +15,6 @@ print("🚀 Starting WASAText Embedded Schema Population");
 print("📊 Generating synthetic messaging data...");
 
 // ---------- helpers ----------
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-function choice(arr) {
-  return arr[randInt(0, arr.length - 1)];
-}
-function randomDateWithinDays(daysBack) {
-  const now = new Date();
-  const past = new Date(now.getTime() - daysBack * 24 * 60 * 60 * 1000);
-  return new Date(past.getTime() + Math.random() * (now.getTime() - past.getTime()));
-}
 
 const firstNames = ["Ana","Maria","Ioana","Elena","Andrei","Mihai","Vlad","Radu","Irina","Teo","Daria","Alex","Matei","Sofia","Bianca","Paul"];
 const lastNames  = ["Popescu","Ionescu","Georgescu","Dumitrescu","Marin","Stan","Matei","Ilie","Moldovan","Rusu","Toma","Petrescu"];
