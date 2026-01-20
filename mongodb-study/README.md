@@ -257,4 +257,11 @@ and index usage were observed and compared.
 
 No production traffic or real user data was used in this study.
 
+## Use of AI Tools
 
+AI-assisted tools were used during the development of this project
+to support documentation drafting, code structuring, and clarity
+improvements.
+
+All design decisions, interpretations, experimental setup, and
+final conclusions were reviewed, validated, and adapted by the author.
