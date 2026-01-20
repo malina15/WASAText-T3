@@ -1,0 +1,257 @@
+test> switched to db wasatext_embedded
+wasatext_embedded> 
+wasatext_embedded> === BEFORE INDEX ===
+
+wasatext_embedded> {
+  nIndexesWas: 2,
+  msg: 'non-_id indexes dropped for collection',
+  ok: 1
+}
+wasatext_embedded> 
+wasatext_embedded> ... ... {
+  explainVersion: '1',
+  queryPlanner: {
+    namespace: 'wasatext_embedded.conversations',
+    indexFilterSet: false,
+    parsedQuery: {},
+    queryHash: '844755D0',
+    planCacheKey: '844755D0',
+    optimizationTimeMillis: 0,
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    winningPlan: {
+      stage: 'SORT',
+      sortPattern: {
+        last_message_at: -1
+      },
+      memLimit: 104857600,
+      limitAmount: 20,
+      type: 'simple',
+      inputStage: {
+        stage: 'COLLSCAN',
+        direction: 'forward'
+      }
+    },
+    rejectedPlans: []
+  },
+  executionStats: {
+    executionSuccess: true,
+    nReturned: 20,
+    executionTimeMillis: 0,
+    totalKeysExamined: 0,
+    totalDocsExamined: 80,
+    executionStages: {
+      stage: 'SORT',
+      nReturned: 20,
+      executionTimeMillisEstimate: 0,
+      works: 102,
+      advanced: 20,
+      needTime: 81,
+      needYield: 0,
+      saveState: 0,
+      restoreState: 0,
+      isEOF: 1,
+      sortPattern: {
+        last_message_at: -1
+      },
+      memLimit: 104857600,
+      limitAmount: 20,
+      type: 'simple',
+      totalDataSizeSorted: 2529290,
+      usedDisk: false,
+      spills: 0,
+      spilledDataStorageSize: 0,
+      inputStage: {
+        stage: 'COLLSCAN',
+        nReturned: 80,
+        executionTimeMillisEstimate: 0,
+        works: 81,
+        advanced: 80,
+        needTime: 0,
+        needYield: 0,
+        saveState: 0,
+        restoreState: 0,
+        isEOF: 1,
+        direction: 'forward',
+        docsExamined: 80
+      }
+    }
+  },
+  command: {
+    find: 'conversations',
+    filter: {},
+    sort: {
+      last_message_at: -1
+    },
+    limit: 20,
+    '$db': 'wasatext_embedded'
+  },
+  serverInfo: {
+    host: 'e775d87faacd',
+    port: 27017,
+    version: '7.0.28',
+    gitVersion: 'cfc346c59d2cc3dbc903507fc642e22e3097f362'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'forceClassicEngine'
+  },
+  ok: 1
+}
+
+wasatext_embedded> 
+wasatext_embedded> === CREATE INDEX ===
+
+wasatext_embedded> last_message_at_-1
+
+wasatext_embedded> 
+wasatext_embedded> === AFTER INDEX ===
+
+wasatext_embedded> ... ... {
+  explainVersion: '1',
+  queryPlanner: {
+    namespace: 'wasatext_embedded.conversations',
+    indexFilterSet: false,
+    parsedQuery: {},
+    queryHash: '844755D0',
+    planCacheKey: '844755D0',
+    optimizationTimeMillis: 0,
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    winningPlan: {
+      stage: 'LIMIT',
+      limitAmount: 20,
+      inputStage: {
+        stage: 'FETCH',
+        inputStage: {
+          stage: 'IXSCAN',
+          keyPattern: {
+            last_message_at: -1
+          },
+          indexName: 'last_message_at_-1',
+          isMultiKey: false,
+          multiKeyPaths: {
+            last_message_at: []
+          },
+          isUnique: false,
+          isSparse: false,
+          isPartial: false,
+          indexVersion: 2,
+          direction: 'forward',
+          indexBounds: {
+            last_message_at: [
+              '[MaxKey, MinKey]'
+            ]
+          }
+        }
+      }
+    },
+    rejectedPlans: []
+  },
+  executionStats: {
+    executionSuccess: true,
+    nReturned: 20,
+    executionTimeMillis: 0,
+    totalKeysExamined: 20,
+    totalDocsExamined: 20,
+    executionStages: {
+      stage: 'LIMIT',
+      nReturned: 20,
+      executionTimeMillisEstimate: 0,
+      works: 21,
+      advanced: 20,
+      needTime: 0,
+      needYield: 0,
+      saveState: 0,
+      restoreState: 0,
+      isEOF: 1,
+      limitAmount: 20,
+      inputStage: {
+        stage: 'FETCH',
+        nReturned: 20,
+        executionTimeMillisEstimate: 0,
+        works: 20,
+        advanced: 20,
+        needTime: 0,
+        needYield: 0,
+        saveState: 0,
+        restoreState: 0,
+        isEOF: 0,
+        docsExamined: 20,
+        alreadyHasObj: 0,
+        inputStage: {
+          stage: 'IXSCAN',
+          nReturned: 20,
+          executionTimeMillisEstimate: 0,
+          works: 20,
+          advanced: 20,
+          needTime: 0,
+          needYield: 0,
+          saveState: 0,
+          restoreState: 0,
+          isEOF: 0,
+          keyPattern: {
+            last_message_at: -1
+          },
+          indexName: 'last_message_at_-1',
+          isMultiKey: false,
+          multiKeyPaths: {
+            last_message_at: []
+          },
+          isUnique: false,
+          isSparse: false,
+          isPartial: false,
+          indexVersion: 2,
+          direction: 'forward',
+          indexBounds: {
+            last_message_at: [
+              '[MaxKey, MinKey]'
+            ]
+          },
+          keysExamined: 20,
+          seeks: 1,
+          dupsTested: 0,
+          dupsDropped: 0
+        }
+      }
+    }
+  },
+  command: {
+    find: 'conversations',
+    filter: {},
+    sort: {
+      last_message_at: -1
+    },
+    limit: 20,
+    '$db': 'wasatext_embedded'
+  },
+  serverInfo: {
+    host: 'e775d87faacd',
+    port: 27017,
+    version: '7.0.28',
+    gitVersion: 'cfc346c59d2cc3dbc903507fc642e22e3097f362'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'forceClassicEngine'
+  },
+  ok: 1
+}
+
+wasatext_embedded> 
