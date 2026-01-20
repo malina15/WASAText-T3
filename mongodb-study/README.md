@@ -265,3 +265,11 @@ improvements.
 
 All design decisions, interpretations, experimental setup, and
 final conclusions were reviewed, validated, and adapted by the author.
+
+## Limitations
+
+Replication and sharding are discussed conceptually but were not deployed
+in a distributed environment due to hardware and time constraints.
+
+The dataset size is synthetic and moderate, intended for comparative
+analysis rather than production-scale benchmarking.
