@@ -2,7 +2,8 @@
 
 This file is used as a **personal execution script** for recording the video
 demonstration required by the Database Systems project (T3).
-All commands are executed from the root of the repository.
+All commands are executed from the repository root, using the VS Code integrated terminal,
+unless explicitly stated otherwise.
 
 ---
 
@@ -122,4 +123,5 @@ The video demonstrates:
 - Docker-based execution of the application
 - MongoDB dataset population
 - Query execution before and after indexing
-- Performance improvement using an index
+- Measurable performance improvement through indexing
+
