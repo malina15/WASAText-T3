@@ -242,7 +242,8 @@ AI-assisted tools were used strictly as **support tools**, not as a replacement 
 - improving clarity and structure of documentation text,
 - suggesting refactoring ideas and code organization patterns,
 - assisting with debugging and validation of MongoDB queries,
-- providing high-level guidance on how a MongoDB-based study could be integrated conceptually into an existing project structure.
+- providing high-level guidance on how a MongoDB-based study could be integrated conceptually into an existing project structure,
+- code navigation, autocomplete suggestions, and refactoring assistance during development.
 
 No verbatim text or code blocks were copied from external sources without modification or attribution.
 
@@ -254,6 +255,10 @@ No verbatim text or code blocks were copied from external sources without modifi
 - **Anthropic, Claude**, https://claude.ai/  
   Used for conceptual guidance on integrating the MongoDB study into the existing WASA project structure.  
   Date accessed: January 2026.
+
+- **Cursor (AI-powered code editor)**, https://www.cursor.sh/  
+  Used during development of the WASA project for code navigation, autocomplete, and refactoring suggestions.  
+  Date accessed: 2025–2026.
 
 
 ## How to run (Embedded demo)
