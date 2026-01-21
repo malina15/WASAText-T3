@@ -11,8 +11,11 @@ This project contains a web application (frontend + backend) and a MongoDB study
 ## Runtime architecture (local)
 The system runs locally using Docker containers. The frontend communicates with the backend via HTTP, and the backend communicates with MongoDB for the study dataset.
 
-> TODO: Add architecture diagram here (exported from diagrams.net / draw.io)
+## Architecture diagram
 
+![System architecture diagram](../images/diagrams/architecture-diagram.png)
+
+**Figure 4.** High-level system architecture showing frontend, backend, and MongoDB components.
 ## Evidence of execution (screenshots)
 
 ### Tool versions
