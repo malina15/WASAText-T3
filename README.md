@@ -108,6 +108,10 @@ The MongoDB work is **independent from the main WASAphoto application logic** an
 All T3 materials are located in:
 
 - `mongodb-study/` (paper + schemas + dataset + scripts + benchmarks)
+- `mongodb-study/docs/crud.md` (CRUD operations with realistic queries)
+- `mongodb-study/docs/aggregations.md` (aggregation pipelines and analytics queries)
+- `mongodb-study/docs/replication.md` (3-node replica set and failover demo)
+- `mongodb-study/docs/sharding.md` (sharding design and justification)
 
 ---
 
@@ -155,5 +159,5 @@ This will:
 ### Notes
 
 - MongoDB is used **only for T3 analysis**, not for the main WASAphoto runtime.
-- The study compares **embedded vs referenced document models**, indexing strategies, and scaling considerations.
+- The study compares embedded vs referenced document models, indexing strategies, includes applied CRUD and aggregation pipelines, a replication demo, and a documented sharding design.
 - All data is **synthetic** and generated locally.
