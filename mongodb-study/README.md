@@ -9,6 +9,18 @@ This study presents a comprehensive analysis of MongoDB schema design strategies
 The complete technical documentation required for the Database Systems project
 is available in the `mongodb-study/` directory and includes:
 
+- **CRUD operations** (create, read, update, delete with realistic queries):  
+  `mongodb-study/docs/crud.md`
+
+- **Aggregation pipelines** (analytics queries with outputs):  
+  `mongodb-study/docs/aggregations.md`
+
+- **Replication demo** (3-node replica set, failover evidence):  
+  `mongodb-study/docs/replication.md`
+
+- **Sharding strategy** (design, shard key analysis, justification):  
+  `mongodb-study/docs/sharding.md`
+
 - **System architecture** (with execution screenshots and environment details):  
   `mongodb-study/docs/architecture.md`
 
@@ -134,6 +146,10 @@ Production systems often employ hybrid models, embedding frequently accessed dat
 - Conversation and message cleanup
 - Historical data archiving
 
+All CRUD operations were implemented and executed directly in MongoDB using realistic
+messaging scenarios and are fully documented with queries and outputs in `crud.md`.
+
+
 ### 4.2 Aggregation Pipelines
 
 MongoDB's aggregation framework enables complex analytical queries:
@@ -141,6 +157,10 @@ MongoDB's aggregation framework enables complex analytical queries:
 - User engagement metrics over time periods
 - Message sentiment analysis aggregations
 - Conversation participant activity summaries
+
+All aggregation pipelines were executed on the embedded schema and validated using
+real dataset outputs, documented in `aggregations.md`.
+
 
 ## 5. Indexing Strategies
 
@@ -176,6 +196,10 @@ MongoDB replica sets provide high availability and read scalability:
 - Automatic failover mechanisms
 - Data consistency guarantees across replicas
 
+A 3-node MongoDB replica set was deployed locally using Docker, and automatic failover
+was demonstrated by stopping the primary node and observing secondary election.
+
+
 ### 6.2 Sharding
 
 Horizontal partitioning enables handling of large datasets:
@@ -183,6 +207,11 @@ Horizontal partitioning enables handling of large datasets:
 - Conversation-based sharding for messaging applications
 - Range-based versus hash-based sharding strategies
 - Shard rebalancing and chunk migration
+
+Sharding was not implemented in a distributed environment due to setup complexity
+and limited dataset size; however, a detailed shard key analysis, deployment plan,
+and evaluation strategy are provided in `sharding.md`.
+
 
 ### 6.3 Geographic Distribution
 
@@ -321,8 +350,9 @@ final conclusions were reviewed, validated, and adapted by the author.
 
 ## Limitations
 
-Replication and sharding are discussed conceptually but were not deployed
-in a distributed environment due to hardware and time constraints.
+Replication was deployed and demonstrated using a local 3-node replica set,
+while sharding is discussed conceptually and documented as a design plan due
+to hardware and time constraints.
 
 The dataset size is synthetic and moderate, intended for comparative
 analysis rather than production-scale benchmarking.
