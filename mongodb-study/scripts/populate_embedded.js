@@ -11,8 +11,8 @@ use(dbName);
 db.users.drop();
 db.conversations.drop();
 
-print("🚀 Starting WASAText Embedded Schema Population");
-print("📊 Generating synthetic messaging data...");
+print(" Starting WASAText Embedded Schema Population");
+print(" Generating synthetic messaging data...");
 
 // ---------- helpers ----------
 
@@ -43,7 +43,7 @@ for (let i = 0; i < USERS; i++) {
 }
 
 db.users.insertMany(userDocs);
-print(`✅ Inserted users: ${db.users.countDocuments()}`);
+print(` Inserted users: ${db.users.countDocuments()}`);
 
 // cache user ids and usernames
 const users = db.users.find({}, { _id: 1, username: 1, display_name: 1 }).toArray();
@@ -154,5 +154,5 @@ for (let i = 0; i < CONVERSATIONS; i++) {
 
 db.conversations.insertMany(convDocs);
 
-print(`✅ Inserted conversations: ${db.conversations.countDocuments()}`);
-print("✅ Done. You can now run queries and explain() benchmarks.");
+print(` Inserted conversations: ${db.conversations.countDocuments()}`);
+print(" Done. You can now run queries and explain() benchmarks.");
