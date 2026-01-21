@@ -232,6 +232,30 @@ Future research directions include investigation of multi-model databases, advan
 [4] Web Scale Architecture. "Scaling Strategies for Real-time Applications." Systems Architecture Quarterly.
 [5] Performance Analysis Methods. "Benchmarking NoSQL Database Systems." Database Performance Journal.
 
+## Academic Integrity and AI Tool Usage
+
+This project is an original academic work developed specifically for the Database Systems course.
+
+All code, experiments, and documentation were written and structured by the author based on personal understanding, experimentation, and analysis. External resources were consulted exclusively for conceptual clarification and best practices.
+
+AI-assisted tools were used strictly as **support tools**, not as a replacement for original work. Their usage was limited to:
+- improving clarity and structure of documentation text,
+- suggesting refactoring ideas and code organization patterns,
+- assisting with debugging and validation of MongoDB queries,
+- providing high-level guidance on how a MongoDB-based study could be integrated conceptually into an existing project structure.
+
+No verbatim text or code blocks were copied from external sources without modification or attribution.
+
+### AI Tools Used
+- **OpenAI, ChatGPT**, https://chatgpt.com/  
+  Used for drafting explanations, refactoring suggestions, and validation guidance.  
+  Date accessed: January 2026.
+
+- **Anthropic, Claude**, https://claude.ai/  
+  Used for conceptual guidance on integrating the MongoDB study into the existing WASA project structure.  
+  Date accessed: January 2026.
+
+
 ## How to run (Embedded demo)
 
 From repo root (`new-wasa`):
