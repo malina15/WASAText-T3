@@ -98,6 +98,12 @@ In the referenced design, conversations and messages are stored in separate coll
 
 ---
 
+## Data model diagram
+
+![Data model diagram](../images/diagrams/data-model-diagram.png)
+
+**Figure X.** Comparison between embedded and referenced MongoDB schema designs.
+
 ## Comparison summary
 
 | Aspect | Embedded schema | Referenced schema |
@@ -110,10 +116,6 @@ In the referenced design, conversations and messages are stored in separate coll
 
 ---
 
-## Diagrams
-> TODO: Add data model diagrams exported from diagrams.net / draw.io.
-- Embedded schema diagram
-- Referenced schema diagram
 
 ---
 
