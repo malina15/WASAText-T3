@@ -4,6 +4,30 @@
 
 This study presents a comprehensive analysis of MongoDB schema design strategies and scaling solutions using WASAText, a messaging application, as a real-world case study. The original WASAText project did not include a real database implementation, and MongoDB is introduced exclusively for schema design and scaling analysis purposes. Through comparative evaluation of embedded versus referenced document models, performance benchmarking, and theoretical scaling analysis, this research demonstrates the trade-offs inherent in NoSQL database design for messaging applications.
 
+## Project Documentation (T3 – MongoDB Study)
+
+The complete technical documentation required for the Database Systems project
+is available in the `mongodb-study/` directory and includes:
+
+- **System architecture** (with execution screenshots and environment details):  
+  `mongodb-study/docs/architecture.md`
+
+- **Data model design** (embedded vs referenced schemas, with diagrams):  
+  `mongodb-study/docs/data-model.md`
+
+- **Benchmarks and performance evaluation** (queries, explain plans, tables, interpretations):  
+  `mongodb-study/docs/benchmarks.md`
+
+- **Bibliographic references and AI tools disclosure**:  
+  `mongodb-study/docs/references.md`
+
+### Diagrams
+All diagrams were created using a dedicated diagramming tool (diagrams.net) and
+are available in:
+
+- `mongodb-study/images/diagrams/architecture-diagram.png`
+- `mongodb-study/images/diagrams/data-model-diagram.png`
+
 ## 1. Introduction
 
 ### 1.1 MongoDB and NoSQL Motivation
