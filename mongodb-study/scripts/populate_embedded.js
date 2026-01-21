@@ -1,5 +1,9 @@
 load("/scripts/lib/random.js");
 
+const { sampleMessages } = require("/scripts/data/messages.js");
+const emojis = ["like", "love", "laugh", "wow", "sad", "angry"];
+
+
 // MongoDB Script: Populate Embedded Schema for WASAText (WORKING)
 // Embedded model: conversations contain embedded messages (and embedded reactions/receipts).
 // Run inside container mongosh: load("/scripts/populate_embedded.js")
@@ -61,20 +65,6 @@ function userMini(uId) {
   return { user_id: u._id, username: u.username, display_name: u.display_name };
 }
 
-const emojis = ["like", "love", "laugh", "wow", "sad", "angry"];
-const sampleTexts = [
-  "Hey! How are you?",
-  "Ok, sounds good.",
-  "I’ll send the details in a minute.",
-  "Nice! 👍",
-  "Let’s meet tomorrow.",
-  "Can you review this?",
-  "I agree with that.",
-  "Great update, thanks!",
-  "Any news on the task?",
-  "Perfect, done."
-];
-
 // ---------- 2) conversations with embedded messages ----------
 let convDocs = [];
 
@@ -124,7 +114,7 @@ for (let i = 0; i < CONVERSATIONS; i++) {
     messages.push({
       _id: msgId,
       sender: userMini(senderId),
-      content: choice(sampleTexts),
+      content: choice(sampleMessages),
       message_type: "text",
       timestamp: new Date(baseTime),
       is_deleted: false,
