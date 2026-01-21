@@ -46,3 +46,13 @@ https://go.dev/doc/
 
 [10] OpenAI. *ChatGPT*.  
 Used for drafting documentation text, structuring explanations, and refining benchmarks presentation.
+
+[11] Anthropic. *Claude*.  
+https://claude.ai/  
+Used for conceptual guidance on integrating the MongoDB study into the existing WASA project structure.  
+Date accessed: January 2026.
+
+[12] Cursor. *AI-powered code editor*.  
+https://www.cursor.sh/  
+Used during development of the WASA project for code navigation, autocomplete, and refactoring suggestions.  
+Date accessed: 2025–2026.
